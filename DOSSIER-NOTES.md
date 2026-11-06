@@ -149,7 +149,7 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 - À revoir pour l'oral : le moindre privilège donne accès à ce dont le composant a besoin, ce qui peut être plusieurs choses, et pas à « une seule chose ».
 - Étape validée par Sicilia.
 
-### Étape 3 - Modèles de données (en cours)
+### Étape 3 - Modèles de données (en cours, presque terminée)
 
 **Ce qui a été fait**
 - `src/models/Utilisateur.js` : pseudo, email, mot de passe, bio, abonnements, dates automatiques.
@@ -171,11 +171,17 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 **Points à traiter plus tard**
 - Double like : un tableau accepte deux fois le même identifiant. À gérer à l'étape 5 avec l'opérateur `$addToSet`.
 
+**Fait le 2026-11-06 (fin de séance)**
+- `Commentaire.js` corrigé par Sicilia : `publication` est un `ObjectId` avec `ref: 'Publication'`, modèle nommé `'Commentaire'`, variable `commentaireSchema`.
+- Fichier `User.js` en double supprimé : le modèle utilisateur est `Utilisateur.js`.
+- Réponse à la question : le commentaire n'a qu'une seule publication à retenir, alors qu'une publication devrait retenir une liste sans limite. Cette liste pourrait dépasser les 16 Mo d'un document MongoDB et obligerait à tout charger d'un coup. On met la référence du côté qui n'en a qu'une.
+- Essai technique réussi avec `scripts/essai-modeles.js` (lancement : `node --env-file=.env scripts/essai-modeles.js`) : création et lecture des trois types de documents, `populate` (remplace un identifiant par le document qu'il désigne), `lowercase` sur l'email, `timestamps`, mot de passe non renvoyé (`select: false`), données invalides refusées avec les messages en français.
+- Nom des collections : Mongoose met le nom du modèle au pluriel et en minuscules (`Commentaire` donne `commentaires`).
+
 **Reprise de la prochaine séance**
-- Corriger `Commentaire.js` (travail de Sicilia) :
-  1. Champ `publication` : `type` doit être `mongoose.Schema.Types.ObjectId` (comme `auteur`), retirer `trim` et `maxlength`, et écrire `ref: 'Publication'` avec une majuscule.
-  2. Ligne `mongoose.model` : le nom doit être `'Commentaire'`, sinon erreur `OverwriteModelError` car `Publication` existe déjà.
-  3. Renommer `publicationSchema` en `commentaireSchema` et adapter les commentaires du code.
-- Répondre à la question : pourquoi est-ce le commentaire qui garde l'identifiant de sa publication, et pas l'inverse ?
-- Ensuite : validation de l'étape (création et lecture d'un document de chaque type), puis 2 ou 3 questions de jury.
+- Vérifier que la base tourne : `sudo docker ps` (ligne `mongo-reseau` avec `Up`).
+- Questions de jury à faire, sans les notes :
+  1. Pourquoi `unique: true` sur l'email, alors que le code pourrait vérifier avant l'inscription si l'email existe déjà ? (indice : deux inscriptions au même moment)
+  2. Puis 1 ou 2 autres questions sur les modèles.
+- Ensuite : valider l'étape 3 et passer à l'étape 4 (hachage du mot de passe avec bcrypt).
 - Astuce retenue : après un copier-coller, rechercher l'ancien mot avec `Ctrl+F` pour tout adapter. Désactiver l'autocomplétion pendant les exercices.

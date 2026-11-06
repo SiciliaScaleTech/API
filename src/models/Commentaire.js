@@ -1,14 +1,12 @@
 const mongoose = require('mongoose');
 
-// Schéma : la forme que doit avoir chaque document "publication"
-const publicationSchema = new mongoose.Schema(
+// Schéma : la forme que doit avoir chaque document "commentaire"
+const commentaireSchema = new mongoose.Schema(
   {
     publication: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
       required: [true, 'La publication est obligatoire'],
-      trim: true,
-      ref: 'publication',
-      maxlength: [500, 'Le contenu ne doit pas dépasser 500 caractères'],
+      ref: 'Publication',
     },
     contenu: {
       type: String,
@@ -28,5 +26,5 @@ const publicationSchema = new mongoose.Schema(
   }
 );
 
-// Modèle : l'outil qui permet de lire et écrire dans la collection "publications"
-module.exports = mongoose.model('Publication', publicationSchema);  
+// Modèle : l'outil qui permet de lire et écrire dans la collection "commentaires"
+module.exports = mongoose.model('Commentaire', commentaireSchema);  
