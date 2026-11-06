@@ -148,3 +148,34 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 - Questions de compréhension : « collection » et « moindre privilège » ont d'abord été confondus ou oubliés, puis retrouvés sans support après une explication par des images (le classeur et ses fiches, la carte d'hôtel).
 - À revoir pour l'oral : le moindre privilège donne accès à ce dont le composant a besoin, ce qui peut être plusieurs choses, et pas à « une seule chose ».
 - Étape validée par Sicilia.
+
+### Étape 3 - Modèles de données (en cours)
+
+**Ce qui a été fait**
+- `src/models/Utilisateur.js` : pseudo, email, mot de passe, bio, abonnements, dates automatiques.
+- `src/models/Publication.js` : contenu, auteur, likes, dates automatiques.
+- `src/models/Commentaire.js` : écrit par Sicilia à partir du modèle Publication, corrections en cours (voir plus bas).
+
+**Choix techniques et justifications**
+- Règle retenue : on imbrique ce qui est petit, borné et toujours lu avec le parent. On référence ce qui peut grandir sans limite ou qui vit sa propre vie.
+- Commentaires dans leur propre collection, avec une référence vers leur publication : un document MongoDB est limité à 16 Mo, une publication peut recevoir des milliers de commentaires, et on veut pouvoir afficher une publication sans ses commentaires ou paginer les commentaires.
+- Likes imbriqués dans la publication, sous forme de tableau d'identifiants : un identifiant pèse 12 octets, il faudrait plusieurs centaines de milliers de likes pour approcher la limite. Sur un réseau à des millions d'utilisateurs, on ferait une collection séparée.
+- Auteur stocké sous forme de référence (identifiant) et non de copie du pseudo : si le pseudo change, il n'y a qu'un seul endroit à modifier.
+- Abonnements : tableau de références vers d'autres utilisateurs.
+- Validation dans le schéma (`required`, `trim`, `minlength`, `maxlength`, `match`) : premier niveau de validation des entrées, avec des messages d'erreur en français.
+- `unique: true` sur le pseudo et l'email : ce n'est pas une validation mais un index MongoDB. C'est la base qui refuse les doublons, même si deux inscriptions arrivent en même temps.
+- `lowercase: true` sur l'email : évite deux comptes avec le même email écrit avec des majuscules différentes.
+- `select: false` sur le mot de passe : il n'est jamais renvoyé par défaut dans les recherches. Le hachage sera fait à l'étape 4.
+- `maxlength` sur les textes : limite aussi l'envoi de textes énormes pour remplir la base.
+
+**Points à traiter plus tard**
+- Double like : un tableau accepte deux fois le même identifiant. À gérer à l'étape 5 avec l'opérateur `$addToSet`.
+
+**Reprise de la prochaine séance**
+- Corriger `Commentaire.js` (travail de Sicilia) :
+  1. Champ `publication` : `type` doit être `mongoose.Schema.Types.ObjectId` (comme `auteur`), retirer `trim` et `maxlength`, et écrire `ref: 'Publication'` avec une majuscule.
+  2. Ligne `mongoose.model` : le nom doit être `'Commentaire'`, sinon erreur `OverwriteModelError` car `Publication` existe déjà.
+  3. Renommer `publicationSchema` en `commentaireSchema` et adapter les commentaires du code.
+- Répondre à la question : pourquoi est-ce le commentaire qui garde l'identifiant de sa publication, et pas l'inverse ?
+- Ensuite : validation de l'étape (création et lecture d'un document de chaque type), puis 2 ou 3 questions de jury.
+- Astuce retenue : après un copier-coller, rechercher l'ancien mot avec `Ctrl+F` pour tout adapter. Désactiver l'autocomplétion pendant les exercices.

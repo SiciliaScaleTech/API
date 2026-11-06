@@ -20,9 +20,9 @@ Chaque étape se termine par une validation. On ne passe à la suivante qu'une f
 - Validation : `curl http://localhost:3000/api/health` renvoie `{"status":"ok"}`
 
 ### Étape 2 - Base MongoDB avec Docker (Bloc 2, accès aux données NoSQL)
-- [ ] MongoDB lancée dans un conteneur
-- [ ] L'API se connecte à la base
-- [ ] Je sais expliquer la différence entre SQL et NoSQL, collection et document
+- [x] MongoDB lancée dans un conteneur
+- [x] L'API se connecte à la base
+- [x] Je sais expliquer la différence entre SQL et NoSQL, collection et document
 - Validation : message « Connecté à MongoDB » au démarrage
 
 ### Étape 3 - Modèles de données (Bloc 2, accès aux données NoSQL)
