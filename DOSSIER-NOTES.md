@@ -1,0 +1,150 @@
+# Notes pour le dossier professionnel
+
+Ce fichier est complété à chaque étape : ce qui a été fait, les choix techniques et leur justification.
+
+## Où ces notes serviront dans le dossier professionnel
+L'API alimente deux exemples de pratique professionnelle de l'activité-type 2 (back-end) :
+- Exemple A : « API REST de réseau social "Fil d'actualité" avec stockage NoSQL » (étapes 1 à 5 de PARCOURS.md)
+- Exemple B : « Sécurisation et documentation du déploiement de l'API de réseau social » (étapes 6, 9 et 10)
+
+Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc classées ainsi :
+1. Tâches ou opérations effectuées, et conditions
+2. Moyens utilisés (outils, langages, bibliothèques, extraits de code commentés)
+3. Avec qui j'ai travaillé
+4. Contexte (organisme, période)
+5. Informations complémentaires (améliorations possibles)
+
+## Exemple A - API REST avec stockage NoSQL
+### 1. Tâches effectuées
+(à compléter)
+### 2. Moyens utilisés
+(à compléter)
+### 5. Améliorations possibles
+(à compléter)
+
+## Exemple B - Sécurisation et documentation du déploiement
+### 1. Tâches effectuées
+(à compléter)
+### 2. Moyens utilisés
+(à compléter)
+### 5. Améliorations possibles
+(à compléter)
+
+## Journal des étapes (choix techniques et justifications)
+### Étape 0 - Environnement (validée)
+
+**Ce qui a été fait**
+- Réorganisation du projet : le code est dans `src/`, comme l'indique `package.json`. Les fichiers `gitignore` et `env.example` ont été renommés en `.gitignore` et `.env.example`. Sans le point, Git ignorait le fichier d'exclusion et `.env` aurait pu être publié.
+- Dépôt Git initialisé. Le fichier `.env` est bien exclu du suivi (vérifié avec `git check-ignore .env`).
+- Windows 11 mis à niveau depuis la version 21H2, qui ne recevait plus de correctifs de sécurité.
+- Mise en place d'un serveur de développement dans une machine virtuelle, à la place de Docker Desktop.
+
+**Choix techniques et justifications**
+- VirtualBox 7.2 : gratuit, open source, déjà utilisé sur le poste.
+- Ubuntu Server 26.04 LTS, sans interface graphique : mises à jour de sécurité garanties jusqu'en 2031, système léger et proche d'un vrai serveur de production.
+- Machine virtuelle de 4 Go de RAM et 2 processeurs. Disque VDI dynamique de 40 Go : il n'occupe sur le disque de l'hôte que l'espace réellement utilisé.
+- Partitionnement LVM, avec la racine étendue à 38 Go : permet d'agrandir les volumes plus tard.
+- Pas de chiffrement du disque (LUKS) : il faudrait saisir une phrase de passe à chaque démarrage, ce qui empêche la connexion SSH directe. Le gain est faible pour une machine de développement sans données réelles.
+- Réseau NAT avec deux redirections de ports limitées à `127.0.0.1` : 2222 vers 22 pour SSH, 3000 vers 3000 pour l'API. La machine n'est joignable que depuis le poste, pas depuis le reste du réseau local.
+- Système mis à jour dès l'installation (`apt upgrade`). Le service `unattended-upgrades` installe ensuite les correctifs de sécurité chaque jour.
+- Docker Engine 29.9 et Docker Compose 5.7, installés depuis le dépôt officiel de Docker avec vérification de signature (clé dans `/etc/apt/keyrings`). Le paquet Snap proposé par l'installateur a été écarté, car il n'est pas maintenu par Docker.
+- Node.js 26 LTS et npm 11, depuis le dépôt signé de NodeSource. Node.js 26 est maintenu jusqu'en 2029, alors que la version des dépôts Ubuntu (22) arrive en fin de vie en avril 2027.
+- Git 2.53.
+- VS Code sur Windows, relié au serveur par l'extension Remote-SSH : l'éditeur reste sur le poste, le code et les outils s'exécutent sur le serveur.
+
+**Sécurité du serveur**
+- Empreinte de la clé d'hôte SSH vérifiée à la première connexion. Protège contre l'attaque de l'homme du milieu.
+- Authentification par une clé SSH ED25519 dédiée à ce serveur. Elle est protégée par une phrase de passe différente du mot de passe du compte, pour éviter la réutilisation d'un même secret.
+- Connexion par mot de passe et connexion directe en root désactivées, dans `/etc/ssh/sshd_config.d/10-securite.conf`. Test réalisé : une connexion sans clé est refusée (`Permission denied (publickey)`).
+- Travail avec un utilisateur normal. `sudo` est utilisé seulement pour l'administration et pour Docker, selon le principe du moindre privilège. L'ajout de l'utilisateur au groupe `docker` a été écarté, car ce groupe donne un accès équivalent à root.
+
+**Limites et améliorations possibles**
+- En production : Docker en mode rootless, pour que le démon ne tourne pas avec les droits root.
+- En production avec des données personnelles : chiffrement du disque.
+
+**Validation de l'étape**
+- Versions vérifiées : Node.js 26.13, npm 11.20, Docker 29.9.3, Docker Compose 5.7, Git 2.53.
+- `npm install` exécuté sur le serveur sans erreur et sans vulnérabilité. Aucune dépendance n'est encore déclarée, Express sera ajouté à l'étape 1.
+- `.env` bien ignoré par Git (`git check-ignore -v .env`).
+- Questions de compréhension traitées : rôle de `package.json` (identité du projet et liste des dépendances, versionné avec `package-lock.json`), de `node_modules` (code des dépendances, non versionné car lourd et reconstructible) et de `.env` (secrets, non versionné, remplacé dans Git par `.env.example`). Risque du groupe `docker` (équivalent root) et intérêt de la clé SSH contre la force brute.
+- Étape validée par Sicilia.
+
+### Étape 1 - Serveur de base (validée)
+
+**Ce qui a été fait**
+- Installation d'Express 5 avec `npm install express`. La dépendance est enregistrée dans `package.json` et sa version exacte dans `package-lock.json`.
+- `src/app.js` : création de l'application Express, ajout du middleware `express.json()` et de la route `GET /api/health`.
+- `src/server.js` : démarrage du serveur sur le port défini par `process.env.PORT`, ou 3000 par défaut.
+- Scripts npm : `npm start` pour lancer l'API, `npm run dev` pour la relancer à chaque modification grâce à l'option `--watch` intégrée à Node.js.
+
+**Choix techniques et justifications**
+- Express : framework web minimaliste et très répandu pour Node.js. Il gère les routes et les middlewares sans imposer de structure lourde.
+- Express 5 plutôt que 4 : version actuelle et maintenue. Elle transmet automatiquement les erreurs des fonctions asynchrones au gestionnaire d'erreurs, ce qui évite d'oublier un `try/catch`.
+- `node --watch` plutôt que nodemon : la fonction est intégrée à Node.js, donc une dépendance de moins à installer et à surveiller.
+- Séparation entre `app.js` et `server.js` : `app.js` décrit l'application (middlewares, routes) et `server.js` la démarre. Les tests pourront importer l'application sans ouvrir de port réseau.
+- Route `/api/health` : permet de vérifier rapidement que l'API fonctionne. Elle servira aussi plus tard au contrôle de santé du conteneur Docker.
+- Préfixe `/api` : sépare clairement les routes de l'API des futures pages du front-end.
+
+**Notions à savoir expliquer**
+- Requête (`req`) : objet qui contient ce que le client envoie (méthode, URL, en-têtes, corps).
+- Réponse (`res`) : objet qui sert à répondre au client (`res.json()`, `res.status()`).
+- Route : association d'une méthode HTTP et d'un chemin à la fonction qui traite la requête.
+- Middleware : fonction `(req, res, next)` exécutée pendant le traitement de la requête, avant la route. Elle peut modifier `req`, répondre directement, ou appeler `next()` pour passer au middleware suivant.
+- Sans `express.json()`, `req.body` vaut `undefined` et la route ne peut pas lire les données JSON envoyées.
+
+**Points de sécurité relevés pour plus tard**
+- L'en-tête `X-Powered-By: Express` révèle la technologie utilisée. Il sera supprimé à l'étape 6 avec helmet.
+- Le fichier `.env` n'est pas encore chargé. Il le sera à l'étape 2.
+
+**Validation de l'étape**
+- `curl -i http://localhost:3000/api/health` renvoie `200 OK` et `{"status":"ok"}`.
+- Une route inconnue renvoie `404`.
+- Questions de compréhension traitées : `req` et `res` bien compris. Les définitions de route et de middleware, ainsi que l'intérêt de séparer `app.js` et `server.js`, ont été corrigées.
+- À revoir pour l'oral : redire sans support les définitions de route et de middleware, et le rôle de `next()`.
+- Étape validée par Sicilia.
+
+### Étape 2 - Base MongoDB avec Docker
+
+**Ce qui a été fait**
+- MongoDB 9.0 lancé dans un conteneur Docker nommé `mongo-reseau`, avec l'image officielle `mongo:9.0`.
+- Compte administrateur créé au premier démarrage, à partir du fichier `.env.mongo` (non versionné, droits `600`).
+- Compte dédié `reseau_api` créé dans la base `reseau_social`, avec le seul rôle `readWrite` sur cette base.
+- Installation de Mongoose 9.12. Connexion dans `src/config/db.js`.
+- `src/server.js` : le serveur ne démarre qu'après la connexion à la base. En cas d'échec, message d'erreur et arrêt avec le code 1.
+- Chargement de `.env` avec l'option `--env-file` de Node.js, dans les scripts `start` et `dev`.
+
+**Choix techniques et justifications**
+- MongoDB dans Docker plutôt qu'installé sur le serveur : environnement isolé, version identique partout, conteneur supprimable et recréable en une commande.
+- Version fixée (`mongo:9.0`) plutôt que `latest` : une mise à jour majeure ne doit pas arriver sans être choisie.
+- Port publié uniquement sur `127.0.0.1` : la base n'est pas joignable depuis le réseau. Docker contourne le pare-feu `ufw`, cette précision est donc indispensable.
+- Volume nommé `mongo-data` : le conteneur est jetable, le volume conserve les données si le conteneur est supprimé ou recréé.
+- `--restart unless-stopped` : la base redémarre automatiquement après un redémarrage du serveur.
+- Fichier `.env.mongo` séparé de `.env` : le conteneur MongoDB ne reçoit pas `JWT_SECRET`, qui ne le concerne pas (moindre privilège).
+- Mots de passe générés avec `openssl rand -hex 24` : 48 caractères aléatoires, sans caractère spécial qui casserait l'URL de connexion.
+- Compte `reseau_api` limité à `readWrite` sur `reseau_social` : principe du moindre privilège. En cas de faille dans l'API, l'attaquant ne peut ni supprimer les autres bases, ni créer de comptes.
+- Mongoose plutôt que le pilote `mongodb` seul : il apporte les schémas et la validation des données, utiles à l'étape 3 et pour la sécurité.
+- `--env-file` de Node.js plutôt que la bibliothèque dotenv : fonction intégrée, une dépendance de moins.
+- Adresse `127.0.0.1` plutôt que `localhost` dans `MONGO_URI` : Node.js peut traduire `localhost` en adresse IPv6 `::1`, alors que MongoDB écoute en IPv4.
+- L'URI de connexion n'est jamais affichée dans la console, car elle contient le mot de passe.
+
+**Difficultés rencontrées et solutions**
+- `chmod` sur un fichier inexistant : la commande était lancée depuis le dossier personnel (`~`) au lieu du dossier du projet. Leçon : vérifier le dossier courant dans l'invite.
+- `printf` : `invalid format character`, à cause d'une faute de frappe (`%` au lieu de `%s`). Le fichier a été créé incomplet et a été régénéré.
+- `U_STRINGPREP_PROHIBITED_ERROR` à la création du compte : le collage a ajouté des caractères invisibles au mot de passe. Solution : le mot de passe est lu directement dans `.env` par une commande, sans copier-coller.
+
+**Tests de validation réalisés**
+- Démarrage normal : `Connecté à MongoDB` puis `API démarrée sur le port 3000`.
+- Mauvais mot de passe : `Authentication failed.` et arrêt de l'API avec le code 1.
+- Connexion sans identifiant : `Command find requires authentication`.
+- `ss -ltn` : MongoDB écoute sur `127.0.0.1:27017` uniquement.
+
+**Notions à savoir expliquer**
+- SQL : base relationnelle, tables, lignes, colonnes fixes, liens par clés étrangères et jointures.
+- NoSQL orienté documents (MongoDB) : collections (équivalent des tables) et documents au format proche du JSON (équivalent des lignes), sans structure imposée, données souvent imbriquées.
+- Moindre privilège : chaque composant ne reçoit que les droits dont il a besoin, pour limiter les dégâts en cas de faille.
+- Volume Docker : stockage géré par Docker en dehors du conteneur. Le conteneur est jetable, le volume garde les données.
+
+**Validation de l'étape**
+- Questions de compréhension : « collection » et « moindre privilège » ont d'abord été confondus ou oubliés, puis retrouvés sans support après une explication par des images (le classeur et ses fiches, la carte d'hôtel).
+- À revoir pour l'oral : le moindre privilège donne accès à ce dont le composant a besoin, ce qui peut être plusieurs choses, et pas à « une seule chose ».
+- Étape validée par Sicilia.
