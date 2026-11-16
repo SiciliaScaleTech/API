@@ -394,7 +394,7 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 - Toutes les fonctionnalités sont en place et testées, y compris les cas interdits : CRUD des publications, commentaires, likes, abonnements, fil d'actualité, et contrôle d'appartenance (403).
 - Comptes de test : `sicilia` et `bob_essai`.
 
-### Étape 6 - Sécurisation (en cours)
+### Étape 6 - Sécurisation
 
 **Point de départ (2026-11-17)**
 - Test d'un JSON mal formé : l'API renvoyait une page HTML avec `X-Powered-By: Express`, le chemin complet des fichiers sur le serveur (avec le nom d'utilisateur Linux) et les noms des bibliothèques internes. C'est une fuite d'informations, due au gestionnaire d'erreurs par défaut d'Express.
@@ -468,5 +468,15 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 - C'est quoi une injection NoSQL ? Le pirate envoie un opérateur MongoDB à la place d'une donnée. Exemple : à la connexion, `{"$ne": null}` au lieu d'un email, ce qui veut dire « différent de rien » et pourrait renvoyer n'importe quel compte. Même principe que l'injection SQL (`' OR 1=1 --`).
 - Point à retravailler : l'injection NoSQL (non retrouvée seule).
 
+**Partie 6f : bilan OWASP API Top 10 (terminée)**
+- Audit de l'API avec les 10 risques de l'OWASP API Security Top 10 (édition 2023). Bilan complet dans `docs/securite.md`, qui servira aussi de document de sécurité pour l'étape 10.
+- Deux trous trouvés et corrigés :
+  - API2 : un mot de passe d'une seule lettre était accepté. Ajout de `minlength: 8` et `maxlength: 72` dans le schéma. La validation a lieu avant le hachage, elle contrôle donc le vrai mot de passe. 72 car bcrypt ignore la suite sans prévenir.
+  - API8 : le serveur démarrait sans `JWT_SECRET`. Il refuse maintenant de démarrer, avec un message clair.
+- Risques connus et acceptés, notés dans le document : énumération des emails à l'inscription (409), jetons non révocables avant leur expiration, compteur de requêtes en mémoire, HTTPS à assurer au déploiement.
+
+**Bilan de l'étape 6**
+- Toutes les tentatives d'attaque simples échouent : injections NoSQL, force brute, JSON mal formé, corps trop gros, mot de passe faible, site tiers (CORS).
+
 **Reprise de la prochaine séance**
-- Partie 6f : bilan OWASP API Top 10.
+- Étape 7 : décider comment couvrir la compétence base de données relationnelle (SQL).

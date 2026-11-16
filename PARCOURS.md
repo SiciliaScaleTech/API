@@ -46,11 +46,11 @@ Chaque étape se termine par une validation. On ne passe à la suivante qu'une f
 - Validation : tests de chaque route, y compris les cas interdits (réussie le 2026-11-17 avec `curl` et deux comptes de test)
 
 ### Étape 6 - Sécurisation (Bloc 2)
-- [ ] Validation des entrées et protection contre l'injection NoSQL
-- [ ] En-têtes de sécurité (helmet), CORS, limitation du nombre de requêtes
-- [ ] Gestion propre des erreurs, sans fuite d'informations
-- [ ] Contrôle avec la liste OWASP API Top 10
-- Validation : tentatives d'attaque simples qui échouent
+- [x] Validation des entrées et protection contre l'injection NoSQL
+- [x] En-têtes de sécurité (helmet), CORS, limitation du nombre de requêtes
+- [x] Gestion propre des erreurs, sans fuite d'informations
+- [x] Contrôle avec la liste OWASP API Top 10 (bilan dans `docs/securite.md`)
+- Validation : tentatives d'attaque simples qui échouent (réussie le 2026-11-17 : injections, force brute, JSON mal formé, corps trop gros, mot de passe faible)
 
 ### Étape 7 - Base relationnelle (Bloc 2, base de données relationnelle)
 - [ ] À décider ensemble : quelle partie du projet ou quel autre projet couvre la compétence SQL

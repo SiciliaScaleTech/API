@@ -25,6 +25,10 @@ const utilisateurSchema = new mongoose.Schema(
     motDePasse: {
       type: String,
       required: [true, 'Le mot de passe est obligatoire'],
+      // La validation a lieu avant le hachage (hook pre('save')) : on contrôle donc le vrai mot de passe
+      minlength: [8, 'Le mot de passe doit contenir au moins 8 caractères'],
+      // bcrypt ne prend en compte que les 72 premiers octets : au-delà, le reste serait ignoré sans prévenir
+      maxlength: [72, 'Le mot de passe ne doit pas dépasser 72 caractères'],
       // select: false : le mot de passe n'est jamais renvoyé par défaut
       // dans les recherches, pour éviter de le divulguer par erreur
       select: false,

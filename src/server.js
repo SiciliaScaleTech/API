@@ -1,7 +1,13 @@
 const app = require('./app');
 const connecterBase = require('./config/db');
 
-// port d'écoute, celui de la configuration, sinon 3000 par défaut 
+// Sans clé secrète, impossible de signer ou vérifier les jetons : on refuse de démarrer
+if (!process.env.JWT_SECRET) {
+  console.error('Impossible de démarrer : la variable JWT_SECRET est absente du fichier .env');
+  process.exit(1);
+}
+
+// port d'écoute, celui de la configuration, sinon 3000 par défaut
 const PORT = process.env.PORT || 3000;
 
 //on se connecte d'abord à la base, puis on démarre le serveur
