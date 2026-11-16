@@ -1,13 +1,18 @@
 const express = require('express');
+const helmet = require('helmet');
 const authRoutes = require('./routes/auth.js');
 const publicationsRoutes = require('./routes/publications.js');
 const utilisateursRoutes = require('./routes/utilisateurs.js');
 const app = express();
 
+// Sécurité : en-têtes de protection sur chaque réponse, et suppression de X-Powered-By
+// Placé en premier pour s'appliquer à toutes les réponses, même aux erreurs
+app.use(helmet());
+
 // Lecture du JSON dans le corps des requêtes
 app.use(express.json());
 
-// route d'authentitfication 
+// Routes d'authentification
 app.use('/api/auth', authRoutes);
 
 // Routes des publications.
