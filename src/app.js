@@ -23,8 +23,9 @@ app.use(
 // Sécurité : pas plus de 100 requêtes par 15 minutes et par adresse IP sur toute l'API
 app.use('/api', limiteurGeneral);
 
-// Lecture du JSON dans le corps des requêtes
-app.use(express.json());
+// Lecture du JSON dans le corps des requêtes, 10 Ko au maximum
+// Nos plus longs textes font 500 caractères : inutile d'accepter plus (au-delà : 413)
+app.use(express.json({ limit: '10kb' }));
 
 // Routes d'authentification
 app.use('/api/auth', authRoutes);

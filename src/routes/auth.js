@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const verifierJeton = require('../middlewares/verifierJeton');
+const messagesValidation = require('../utils/messagesValidation');
 const { limiteurAuth } = require('../middlewares/limiteurs');
 
 
@@ -33,7 +34,7 @@ router.post('/inscription', limiteurAuth, async (req, res) => {
   } catch (erreur) {
     // Données refusées par le schéma : on renvoie la liste des messages d'erreur
     if (erreur.name === 'ValidationError') {
-      const messages = Object.values(erreur.errors).map((e) => e.message);
+      const messages = messagesValidation(erreur);
       return res.status(400).json({ message: 'Données invalides', erreurs: messages });
     }
     // Pseudo ou email déjà utilisé : MongoDB renvoie le code 11000 (index unique)

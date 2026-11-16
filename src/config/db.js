@@ -1,5 +1,10 @@
 const mongoose = require('mongoose');
 
+// Sécurité contre l'injection NoSQL : dans les recherches, Mongoose neutralise
+// tout objet qui contient un opérateur commençant par $ (comme $ne ou $gt)
+// Un opérateur voulu par nous doit être marqué explicitement avec mongoose.trusted()
+mongoose.set('sanitizeFilter', true);
+
 // Connexion à MongoDB avec l'adresse définie dans .env
 async function connecterBase() {
   const uri = process.env.MONGO_URI;

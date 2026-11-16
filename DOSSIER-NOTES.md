@@ -448,5 +448,25 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 - À quoi sert CORS, et empêche-t-il un appel avec curl ? Il indique au navigateur quels sites peuvent appeler l'API, pour protéger les utilisateurs contre un site piégé. Il n'empêche pas curl, car c'est le navigateur qui fait le contrôle.
 - Point à retravailler : CORS (non retrouvé seule). Image du videur qui ne travaille que dans les navigateurs.
 
+**Partie 6e : injections NoSQL et taille des requêtes (terminée)**
+- Audit de départ, en jouant le pirate :
+  - connexion avec `{"$ne": null}` : déjà bloquée (400) par le contrôle `typeof` de l'étape 4
+  - pseudo ou contenu envoyés sous forme d'objet avec un opérateur `$` : déjà refusés (400) par le typage des schémas, mais le message de Mongoose révélait la bibliothèque et le nom des modèles
+  - corps de 50 Ko : lu en entier avant d'être refusé, car la limite par défaut d'Express est de 100 Ko
+- Corrections :
+  1. `src/utils/messagesValidation.js` : une fonction qui remplace les messages techniques (`CastError`) par « Le champ X a un format invalide » et garde nos propres messages. Elle remplace la même ligne recopiée dans 4 routes.
+  2. `express.json({ limit: '10kb' })` : au-delà, 413 tout de suite.
+  3. `mongoose.set('sanitizeFilter', true)` dans `db.js` : Mongoose neutralise tout opérateur `$` reçu dans une recherche. Nos propres opérateurs sont marqués avec `mongoose.trusted()`, comme le `$in` du fil.
+- Tests après correction : messages propres (400), corps de 50 Ko (413), recherche directe avec `{ $ne: null }` refusée par Mongoose. Non-régression : fil, liste, commentaires, profil, likes et messages du schéma fonctionnent.
+
+**Choix techniques et justifications**
+- Défense en profondeur : trois barrières contre l'injection NoSQL (contrôle `typeof`, typage des schémas, `sanitizeFilter`). Si l'une manque un jour, les autres tiennent.
+- 10 Ko suffisent largement (le plus long texte fait 500 caractères) et limitent l'épuisement du serveur.
+- Une seule fonction pour les messages d'erreur : une modification se fait à un seul endroit.
+
+**Question de jury, partie 6e (2026-11-17)**
+- C'est quoi une injection NoSQL ? Le pirate envoie un opérateur MongoDB à la place d'une donnée. Exemple : à la connexion, `{"$ne": null}` au lieu d'un email, ce qui veut dire « différent de rien » et pourrait renvoyer n'importe quel compte. Même principe que l'injection SQL (`' OR 1=1 --`).
+- Point à retravailler : l'injection NoSQL (non retrouvée seule).
+
 **Reprise de la prochaine séance**
-- Partie 6e : injections NoSQL et taille des requêtes.
+- Partie 6f : bilan OWASP API Top 10.

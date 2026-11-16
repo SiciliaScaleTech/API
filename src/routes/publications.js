@@ -5,6 +5,7 @@ const Publication = require('../models/Publication');
 const Commentaire = require('../models/Commentaire');
 const Utilisateur = require('../models/Utilisateur');
 const verifierJeton = require('../middlewares/verifierJeton');
+const messagesValidation = require('../utils/messagesValidation');
 
 // 2. Le routeur : le groupe des routes des publications
 const router = express.Router();
@@ -26,7 +27,7 @@ router.post('/', verifierJeton, async (req, res) => {
   } catch (erreur) {
     // Contenu vide ou trop long : refusé par le schéma
     if (erreur.name === 'ValidationError') {
-      const messages = Object.values(erreur.errors).map((e) => e.message);
+      const messages = messagesValidation(erreur);
       return res.status(400).json({ message: 'Données invalides', erreurs: messages });
     }
     console.error(erreur);
@@ -61,7 +62,8 @@ router.get('/fil', verifierJeton, async (req, res) => {
     // Les auteurs du fil : les personnes que je suis, plus moi-même
     const auteurs = moi.abonnements.concat(moi._id);
 
-    const publications = await Publication.find({ auteur: { $in: auteurs } }) // $in = "fait partie de la liste"
+    // $in = "fait partie de la liste". mongoose.trusted : c'est nous qui écrivons cet opérateur, pas le client
+    const publications = await Publication.find({ auteur: mongoose.trusted({ $in: auteurs }) })
       .sort({ createdAt: -1 })
       .limit(20)
       .populate('auteur', 'pseudo');
@@ -121,7 +123,7 @@ router.put('/:id', verifierJeton, async (req, res) => {
   } catch (erreur) {
     // Contenu vide ou trop long : refusé par le schéma
     if (erreur.name === 'ValidationError') {
-      const messages = Object.values(erreur.errors).map((e) => e.message);
+      const messages = messagesValidation(erreur);
       return res.status(400).json({ message: 'Données invalides', erreurs: messages });
     }
     console.error(erreur);
@@ -180,7 +182,7 @@ router.post('/:id/commentaires', verifierJeton, async (req, res) => {
   } catch (erreur) {
     // Contenu vide ou trop long : refusé par le schéma
     if (erreur.name === 'ValidationError') {
-      const messages = Object.values(erreur.errors).map((e) => e.message);
+      const messages = messagesValidation(erreur);
       return res.status(400).json({ message: 'Données invalides', erreurs: messages });
     }
     console.error(erreur);
