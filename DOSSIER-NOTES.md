@@ -559,7 +559,7 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 - `public/js/cartes.js` : la carte d'une publication, partagée par le fil et le profil. Like (POST ou DELETE selon l'état), commentaires chargés seulement à l'ouverture, modification dans la carte, suppression avec confirmation.
 - `public/js/profil.js` : lit l'id dans l'adresse avec `URLSearchParams` (`profil.html?id=...`). Sans id, affiche mon profil. Bouton « Suivre » ou « Ne plus suivre », caché sur mon propre profil.
 - Limite générale de requêtes passée de 100 à 300 par 15 minutes : un vrai front fait plus d'appels. La limite de la connexion reste à 10.
-- Bug trouvé par Sicilia : le bouton « Suivre » restait visible sur son propre profil. Cause : `.bouton { display: inline-block }` écrasait l'attribut `hidden`. Même problème pour le formulaire d'inscription. Correction : `[hidden] { display: none !important; }`.
+- Bug trouvé par Sicilia : le bouton « Suivre » restait visible sur son propre profil. Cause : `.bouton { display: inline-block }` écrasait l'attribut `hidden`. Même problème pour le formulaire d'inscription. Correction : `[hidden] { display: none !important }`.
 - Tests dans le navigateur, réussis par Sicilia : like et retrait, commentaire ajouté puis supprimé, modification, suppression, boutons absents sur les publications des autres, abonnement depuis le profil, « Mon fil » mis à jour.
 
 **Choix techniques et justifications**
