@@ -19,6 +19,13 @@
 }
 
 /* Base */
+
+/* Un élément avec l'attribut hidden est toujours caché, même si une autre règle lui donne un display
+   (sans cette règle, .bouton { display: inline-block } rendait le bouton Suivre visible sur mon profil) */
+[hidden] {
+  display: none !important;
+}
+
 * {
   box-sizing: border-box; /* la largeur inclut les marges intérieures et la bordure */
 }
