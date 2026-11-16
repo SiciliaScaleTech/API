@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="740" viewBox="0 0 360 740" font-family="Arial, sans-serif">
+  <rect width="360" height="740" fill="#ffffff" stroke="#999" stroke-width="2"/>
+
+  <!-- En-tête -->
+  <rect x="0" y="0" width="360" height="56" fill="#333"/>
+  <text x="16" y="35" font-size="20" font-weight="bold" fill="#fff">Réseau</text>
+  <rect x="262" y="14" width="84" height="28" fill="none" stroke="#fff"/>
+  <text x="304" y="33" text-anchor="middle" font-size="12" fill="#fff">Déconnexion</text>
+
+  <text x="16" y="86" font-size="13" fill="#225" text-decoration="underline">← Retour au fil</text>
+
+  <!-- Identité -->
+  <circle cx="180" cy="150" r="42" fill="#ddd" stroke="#999"/>
+  <text x="180" y="162" text-anchor="middle" font-size="32" fill="#666">B</text>
+  <text x="180" y="222" text-anchor="middle" font-size="20" font-weight="bold" fill="#222">bob_essai</text>
+  <text x="180" y="248" text-anchor="middle" font-size="13" fill="#888">Pas encore de bio</text>
+  <text x="180" y="278" text-anchor="middle" font-size="13" fill="#444">2 publications · suit 1 membre</text>
+
+  <!-- Bouton d'abonnement -->
+  <rect x="100" y="296" width="160" height="40" fill="#333"/>
+  <text x="180" y="321" text-anchor="middle" font-size="15" fill="#fff">Suivre</text>
+  <text x="180" y="356" text-anchor="middle" font-size="11" fill="#888">Devient « Ne plus suivre » si je le suis déjà.</text>
+  <text x="180" y="372" text-anchor="middle" font-size="11" fill="#888">Absent sur mon propre profil.</text>
+
+  <!-- Publications du membre -->
+  <text x="16" y="410" font-size="16" font-weight="bold" fill="#222">Publications</text>
+  <rect x="12" y="422" width="336" height="96" fill="#fff" stroke="#ccc"/>
+  <text x="24" y="448" font-size="11" fill="#999">17/11/2026 14:05</text>
+  <text x="24" y="474" font-size="14" fill="#222">Bonjour, je suis Bob !</text>
+  <text x="24" y="504" font-size="13" fill="#333">♥ 2 · 2 commentaires</text>
+
+  <rect x="12" y="530" width="336" height="96" fill="#fff" stroke="#ccc"/>
+  <text x="24" y="556" font-size="11" fill="#999">16/11/2026 13:25</text>
+  <text x="24" y="582" font-size="14" fill="#222">Bravo pour ta première publication !</text>
+  <text x="24" y="612" font-size="13" fill="#333">♡ 0 · 0 commentaire</text>
+</svg>

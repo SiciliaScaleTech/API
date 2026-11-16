@@ -501,5 +501,27 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 - Réseau social : contenus de forme souple, listes intégrées dans les documents (likes, abonnements), d'où MongoDB.
 - Réponse de Sicilia (2026-11-18) : InfoStock utilise MySQL pour les liens précis entre les tables (fournisseurs, produits). Le réseau social utilise MongoDB car les publications et commentaires peuvent être très nombreux, et MongoDB peut se répartir sur plusieurs serveurs (scalabilité horizontale). À compléter par la souplesse des documents : likes et abonnements rangés à l'intérieur, sans table de liaison.
 
+### Étape 8 - Interface front-end (en cours)
+
+**Découpage**
+- 8a maquettes, 8b pages HTML et CSS statiques, 8c JavaScript : connexion, fil, publier, 8d likes, commentaires, profil, abonnements.
+
+**Choix d'organisation**
+- Le front est rangé dans `public/` et envoyé par le serveur Express. Front et API sont sur la même adresse : un seul serveur à lancer et à mettre dans Docker, pas de problème de CORS, et la Content-Security-Policy de helmet s'applique aussi aux pages.
+- Tout le JavaScript est dans des fichiers `.js` séparés, jamais dans le HTML : c'est imposé par la CSP et c'est une protection contre le XSS.
+
+**Partie 8a : maquettes (terminée)**
+- 4 maquettes (wireframes) en SVG dans `docs/maquettes/` : connexion et inscription (mobile), fil (mobile), profil d'un membre (mobile), fil (ordinateur).
+- Choix de conception :
+  - mobile first : on conçoit d'abord pour le petit écran, puis on agrandit. Sur ordinateur, contenu centré sur 600 px pour rester lisible, et panneau « mon profil » à droite.
+  - « Modifier » et « Supprimer » seulement sur ses propres publications : l'interface suit le contrôle d'appartenance de l'API.
+  - zone de message d'erreur dans les formulaires, pour afficher les réponses de l'API.
+  - compteur 0 / 500 : prévient avant de dépasser la limite du schéma.
+  - deux onglets : « Mon fil » (route `/fil`) et « Découvrir » (toutes les publications), pour qu'un nouveau membre trouve des personnes à suivre.
+- Les maquettes ont révélé deux manques dans l'API : voir le profil d'un autre membre, et savoir qui on suit déjà. Ces routes seront ajoutées en 8d.
+
+**Question de jury, partie 8a (2026-11-18)**
+- Pourquoi faire des maquettes avant de coder ? Pour voir à quoi ressemblera le site, choisir les bons outils, éviter les oublis pendant le code. Modifier une maquette est plus simple que modifier du code. On ne code qu'une fois la maquette validée. Réponse donnée seule, complète.
+
 **Reprise de la prochaine séance**
-- Étape 8 : interface front-end.
+- Partie 8b : pages HTML et CSS statiques.

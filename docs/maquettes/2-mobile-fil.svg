@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="740" viewBox="0 0 360 740" font-family="Arial, sans-serif">
+  <rect width="360" height="740" fill="#ffffff" stroke="#999" stroke-width="2"/>
+
+  <!-- En-tête -->
+  <rect x="0" y="0" width="360" height="56" fill="#333"/>
+  <text x="16" y="35" font-size="20" font-weight="bold" fill="#fff">Réseau</text>
+  <text x="250" y="27" text-anchor="end" font-size="13" fill="#fff">sicilia</text>
+  <text x="250" y="44" text-anchor="end" font-size="11" fill="#ccc">Mon profil</text>
+  <rect x="262" y="14" width="84" height="28" fill="none" stroke="#fff"/>
+  <text x="304" y="33" text-anchor="middle" font-size="12" fill="#fff">Déconnexion</text>
+
+  <!-- Onglets -->
+  <rect x="0" y="56" width="180" height="44" fill="#fff"/>
+  <rect x="0" y="96" width="180" height="4" fill="#333"/>
+  <text x="90" y="84" text-anchor="middle" font-size="15" font-weight="bold" fill="#333">Mon fil</text>
+  <rect x="180" y="56" width="180" height="44" fill="#f4f4f4"/>
+  <text x="270" y="84" text-anchor="middle" font-size="15" fill="#666">Découvrir</text>
+
+  <!-- Zone de publication -->
+  <rect x="12" y="112" width="336" height="118" fill="#fafafa" stroke="#ccc"/>
+  <rect x="24" y="124" width="312" height="60" fill="#fff" stroke="#999"/>
+  <text x="36" y="148" font-size="13" fill="#aaa">Quoi de neuf ?</text>
+  <text x="24" y="212" font-size="12" fill="#888">0 / 500</text>
+  <rect x="252" y="194" width="84" height="28" fill="#333"/>
+  <text x="294" y="213" text-anchor="middle" font-size="13" fill="#fff">Publier</text>
+
+  <!-- Publication 1 (d'un autre membre) -->
+  <rect x="12" y="244" width="336" height="250" fill="#fff" stroke="#ccc"/>
+  <text x="24" y="270" font-size="14" font-weight="bold" fill="#225" text-decoration="underline">bob_essai</text>
+  <text x="336" y="270" text-anchor="end" font-size="11" fill="#999">17/11/2026 14:05</text>
+  <text x="24" y="298" font-size="14" fill="#222">Bonjour, je suis Bob !</text>
+  <rect x="24" y="318" width="90" height="28" fill="#fff" stroke="#999"/>
+  <text x="69" y="337" text-anchor="middle" font-size="13" fill="#333">♥ J'aime 2</text>
+  <text x="128" y="337" font-size="13" fill="#333">2 commentaires</text>
+  <!-- Commentaires -->
+  <rect x="24" y="356" width="312" height="126" fill="#f4f4f4"/>
+  <text x="34" y="378" font-size="12" fill="#222"><tspan font-weight="bold">sicilia</tspan> Merci Bob !</text>
+  <text x="34" y="400" font-size="12" fill="#222"><tspan font-weight="bold">bob_essai</tspan> Avec plaisir</text>
+  <rect x="34" y="414" width="210" height="32" fill="#fff" stroke="#999"/>
+  <text x="44" y="435" font-size="12" fill="#aaa">Écrire un commentaire</text>
+  <rect x="250" y="414" width="76" height="32" fill="#333"/>
+  <text x="288" y="435" text-anchor="middle" font-size="12" fill="#fff">Envoyer</text>
+  <text x="34" y="470" font-size="11" fill="#888">(Supprimer apparaît sur mes propres commentaires)</text>
+
+  <!-- Publication 2 (la mienne) -->
+  <rect x="12" y="508" width="336" height="130" fill="#fff" stroke="#ccc"/>
+  <text x="24" y="534" font-size="14" font-weight="bold" fill="#225" text-decoration="underline">sicilia</text>
+  <text x="336" y="534" text-anchor="end" font-size="11" fill="#999">16/11/2026 13:10</text>
+  <text x="24" y="562" font-size="14" fill="#222">Ma première publication, modifiée !</text>
+  <rect x="24" y="582" width="90" height="28" fill="#fff" stroke="#999"/>
+  <text x="69" y="601" text-anchor="middle" font-size="13" fill="#333">♡ J'aime 0</text>
+  <text x="128" y="601" font-size="13" fill="#333">0 commentaire</text>
+  <text x="270" y="601" text-anchor="end" font-size="12" fill="#225" text-decoration="underline">Modifier</text>
+  <text x="336" y="601" text-anchor="end" font-size="12" fill="#a33" text-decoration="underline">Supprimer</text>
+  <text x="24" y="628" font-size="11" fill="#888">(Modifier et Supprimer : seulement sur mes publications)</text>
+
+  <text x="180" y="680" text-anchor="middle" font-size="12" fill="#999">« Mon fil » : les gens que je suis et moi.</text>
+  <text x="180" y="698" text-anchor="middle" font-size="12" fill="#999">« Découvrir » : toutes les publications.</text>
+  <text x="180" y="716" text-anchor="middle" font-size="12" fill="#999">Clic sur un pseudo : page profil de ce membre.</text>
+</svg>
