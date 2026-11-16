@@ -26,9 +26,10 @@ Chaque étape se termine par une validation. On ne passe à la suivante qu'une f
 - Validation : message « Connecté à MongoDB » au démarrage
 
 ### Étape 3 - Modèles de données (Bloc 2, accès aux données NoSQL)
-- [ ] Schémas Mongoose : utilisateur, publication, commentaire
-- [ ] Choix documentés : données imbriquées ou références
-- Validation : création et lecture d'un document de chaque type
+- [x] Schémas Mongoose : utilisateur, publication, commentaire
+- [x] Choix documentés : données imbriquées ou références
+- [x] Je sais expliquer mes choix de modèles devant le jury (questions faites le 2026-11-16)
+- Validation : création et lecture d'un document de chaque type (réussie le 2026-11-06 avec `scripts/essai-modeles.js`)
 
 ### Étape 4 - Inscription et connexion (Bloc 2, composants métier, sécurité)
 - [ ] Mot de passe haché (bcrypt)

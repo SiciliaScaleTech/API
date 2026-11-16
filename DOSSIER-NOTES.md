@@ -149,7 +149,7 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 - À revoir pour l'oral : le moindre privilège donne accès à ce dont le composant a besoin, ce qui peut être plusieurs choses, et pas à « une seule chose ».
 - Étape validée par Sicilia.
 
-### Étape 3 - Modèles de données (en cours, presque terminée)
+### Étape 3 - Modèles de données (validée le 2026-11-16)
 
 **Ce qui a été fait**
 - `src/models/Utilisateur.js` : pseudo, email, mot de passe, bio, abonnements, dates automatiques.
@@ -178,10 +178,14 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 - Essai technique réussi avec `scripts/essai-modeles.js` (lancement : `node --env-file=.env scripts/essai-modeles.js`) : création et lecture des trois types de documents, `populate` (remplace un identifiant par le document qu'il désigne), `lowercase` sur l'email, `timestamps`, mot de passe non renvoyé (`select: false`), données invalides refusées avec les messages en français.
 - Nom des collections : Mongoose met le nom du modèle au pluriel et en minuscules (`Commentaire` donne `commentaires`).
 
-**Reprise de la prochaine séance**
-- Vérifier que la base tourne : `sudo docker ps` (ligne `mongo-reseau` avec `Up`).
-- Questions de jury à faire, sans les notes :
-  1. Pourquoi `unique: true` sur l'email, alors que le code pourrait vérifier avant l'inscription si l'email existe déjà ? (indice : deux inscriptions au même moment)
-  2. Puis 1 ou 2 autres questions sur les modèles.
-- Ensuite : valider l'étape 3 et passer à l'étape 4 (hachage du mot de passe avec bcrypt).
+**Validation de l'étape (2026-11-16)**
+- Questions de jury, sans les notes :
+  1. `unique: true` plutôt qu'une vérification dans le code : bonne réponse de Sicilia. Si deux inscriptions arrivent au même moment, les deux vérifications peuvent passer avant l'enregistrement (situation de concurrence, ou *race condition*). L'index unique fait le contrôle au moment même de l'écriture, de façon atomique. Complété : `unique` n'est pas un validateur Mongoose mais un index, le doublon renvoie l'erreur MongoDB `E11000` qu'on traduira en statut HTTP 409 à l'étape 4. L'index accélère aussi la recherche par email à la connexion.
+  2. `select: false` : réponse partielle (« éviter de le voir »). Complété : le champ est exclu par défaut des résultats de recherche, donc jamais renvoyé par erreur dans une réponse JSON. Il ne chiffre rien, c'est le hachage bcrypt qui protège le mot de passe dans la base. Ce sont deux couches de défense en profondeur. On le contourne seulement à la connexion avec `.select('+motDePasse')`, pour comparer avec `bcrypt.compare`.
+  3. Référence de l'auteur plutôt que copie du pseudo : bonne réponse sur l'avantage (un seul endroit à modifier, une seule source de vérité, normalisation). Complété : le prix est une requête supplémentaire à la lecture (`populate`).
+- À revoir pour l'oral : bien distinguer « cacher un champ » (`select: false`) et « rendre illisible » (hachage). Toujours citer l'avantage ET le coût d'un choix de modélisation.
+- Étape validée.
+
+**Suite**
+- Étape 4 : inscription et connexion, avec hachage du mot de passe (bcrypt).
 - Astuce retenue : après un copier-coller, rechercher l'ancien mot avec `Ctrl+F` pour tout adapter. Désactiver l'autocomplétion pendant les exercices.
