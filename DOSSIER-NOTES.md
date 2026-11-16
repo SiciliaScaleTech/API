@@ -501,7 +501,7 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 - Réseau social : contenus de forme souple, listes intégrées dans les documents (likes, abonnements), d'où MongoDB.
 - Réponse de Sicilia (2026-11-18) : InfoStock utilise MySQL pour les liens précis entre les tables (fournisseurs, produits). Le réseau social utilise MongoDB car les publications et commentaires peuvent être très nombreux, et MongoDB peut se répartir sur plusieurs serveurs (scalabilité horizontale). À compléter par la souplesse des documents : likes et abonnements rangés à l'intérieur, sans table de liaison.
 
-### Étape 8 - Interface front-end (en cours)
+### Étape 8 - Interface front-end
 
 **Découpage**
 - 8a maquettes, 8b pages HTML et CSS statiques, 8c JavaScript : connexion, fil, publier, 8d likes, commentaires, profil, abonnements.
@@ -552,5 +552,27 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 **Question de jury, partie 8c (2026-11-18)**
 - Pourquoi `textContent` et pas `innerHTML` ? Les publications viennent des utilisateurs. Avec innerHTML, le navigateur interpréterait leur texte comme du HTML, et un pirate pourrait y cacher du code exécuté chez tous les lecteurs du fil (XSS). Avec textContent, le texte est affiché, jamais exécuté. Image : innerHTML lit la recette et la cuisine, textContent la recopie sur un papier.
 
+**Partie 8d : likes, commentaires, modification, suppression, profil et abonnements (terminée)**
+- Deux routes ajoutées à l'API, repérées grâce aux maquettes :
+  - `GET /api/utilisateurs/:id` : profil public (pseudo, bio, nombre d'abonnements, nombre de publications avec `countDocuments`). Jamais l'email, donnée personnelle (OWASP API3).
+  - `GET /api/utilisateurs/:id/publications` : les publications d'un membre.
+- `public/js/cartes.js` : la carte d'une publication, partagée par le fil et le profil. Like (POST ou DELETE selon l'état), commentaires chargés seulement à l'ouverture, modification dans la carte, suppression avec confirmation.
+- `public/js/profil.js` : lit l'id dans l'adresse avec `URLSearchParams` (`profil.html?id=...`). Sans id, affiche mon profil. Bouton « Suivre » ou « Ne plus suivre », caché sur mon propre profil.
+- Limite générale de requêtes passée de 100 à 300 par 15 minutes : un vrai front fait plus d'appels. La limite de la connexion reste à 10.
+- Bug trouvé par Sicilia : le bouton « Suivre » restait visible sur son propre profil. Cause : `.bouton { display: inline-block }` écrasait l'attribut `hidden`. Même problème pour le formulaire d'inscription. Correction : `[hidden] { display: none !important; }`.
+- Tests dans le navigateur, réussis par Sicilia : like et retrait, commentaire ajouté puis supprimé, modification, suppression, boutons absents sur les publications des autres, abonnement depuis le profil, « Mon fil » mis à jour.
+
+**Choix techniques et justifications**
+- Un fichier partagé pour la carte : le code n'est écrit qu'une fois.
+- Commentaires chargés à la demande : moins de requêtes vers l'API.
+- Les boutons cachés ne sont qu'un confort. La vraie protection est le contrôle d'appartenance de l'API (403).
+
+**Question de jury, partie 8d (2026-11-18)**
+- Cacher « Modifier » et « Supprimer » suffit-il ? Non. Un pirate peut envoyer la requête DELETE avec curl. La protection est dans l'API, qui répond 403 si l'auteur n'est pas la personne du jeton. Formule à retenir : le front aide l'utilisateur, le back protège les données.
+- Point à retravailler : Sicilia pensait que cacher les boutons suffisait.
+
+**Bilan de l'étape 8**
+- Parcours complet réalisé depuis le navigateur : inscription, connexion, publication, like, commentaire, modification, suppression, abonnement, fil, déconnexion.
+
 **Reprise de la prochaine séance**
-- Partie 8d : likes, commentaires, modifier, supprimer, profil et abonnements.
+- Étape 9 : Docker (Dockerfile et docker-compose).

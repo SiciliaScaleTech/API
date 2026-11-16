@@ -57,10 +57,10 @@ Chaque étape se termine par une validation. On ne passe à la suivante qu'une f
 - Décision du 2026-11-18 : la compétence est couverte par le projet InfoStock (PHP/MySQL), qui contient la conception (diagrammes), la création des tables et les requêtes SQL. Pas de partie SQL ajoutée à cette API.
 
 ### Étape 8 - Interface front-end (Bloc 1)
-- [ ] Maquettes des écrans (connexion, fil d'actualité, profil)
-- [ ] Pages HTML/CSS statiques
-- [ ] JavaScript qui appelle l'API (fetch) pour afficher et envoyer les données
-- Validation : parcours complet inscription, connexion, publication, depuis le navigateur
+- [x] Maquettes des écrans (connexion, fil d'actualité, profil), dans `docs/maquettes/`
+- [x] Pages HTML/CSS statiques
+- [x] JavaScript qui appelle l'API (fetch) pour afficher et envoyer les données
+- Validation : parcours complet inscription, connexion, publication, depuis le navigateur (réussie le 2026-11-18)
 
 ### Étape 9 - Docker (Bloc 2, documentation du déploiement)
 - [ ] Dockerfile de l'API
