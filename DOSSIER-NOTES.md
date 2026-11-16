@@ -219,5 +219,27 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 - À quoi sert `select: false` ? Il cache le mot de passe dans toutes les recherches par défaut, pour ne jamais l'envoyer par erreur au navigateur. On le demande seulement à la connexion, avec `select('+motDePasse')`.
 - Point à retravailler : la question 3 (`select: false`) n'a pas été retrouvée seule.
 
+**Partie 2 : route d'inscription (terminée)**
+- Fichier `src/routes/auth.js` : un routeur Express, branché dans `app.js` avec `app.use('/api/auth', authRoutes)`. Les routes sont rangées par thème pour garder `app.js` lisible.
+- Route `POST /api/auth/inscription` : lit `pseudo`, `email` et `motDePasse`, appelle `Utilisateur.create`, répond 201 avec `id`, `pseudo` et `email`.
+- Testée avec `curl` : réponse `201 Created`.
+- Choix de sécurité :
+  - On ne prend que les 3 champs attendus dans `req.body`, pour éviter l'assignation de masse (un client qui ajoute des champs non prévus).
+  - On choisit les champs renvoyés, pour ne jamais renvoyer l'empreinte du mot de passe. `select: false` ne joue que sur les recherches, pas sur le document qu'on vient de créer.
+  - En cas d'erreur inconnue, le détail est affiché dans le terminal du serveur, le client reçoit seulement « Erreur serveur ».
+- Codes HTTP selon l'erreur : 400 si le schéma refuse les données, 409 si le pseudo ou l'email existe déjà (code MongoDB 11000, index unique), 500 sinon.
+- À noter pour l'étape 6 : l'en-tête `X-Powered-By: Express` révèle la technologie utilisée. Il sera supprimé avec `helmet`.
+
+- Tests réalisés avec `curl` :
+  - nouveau compte : `201 Created`
+  - même pseudo et même email : `409 Conflict`
+  - pseudo de 2 lettres et email sans `@` : `400 Bad Request`, avec les messages écrits dans le schéma (« Le pseudo doit contenir au moins 3 caractères », « Le format de l'email est invalide »)
+- Repère sur les codes HTTP : 2xx = succès, 4xx = erreur du client, 5xx = erreur du serveur.
+
+**Questions de jury, partie 2 (2026-11-16)**
+- Expliquer le bloc `if (erreur.code === 11000)` : si MongoDB renvoie l'erreur 11000, qui veut dire que le pseudo ou l'email existe déjà, alors on répond 409 avec le message « Ce pseudo ou cet email est déjà utilisé ».
+- Pourquoi 400 ou 409 et pas 500 ? Ce n'est pas un bug du serveur mais une demande du client qui pose problème. Un code 4xx permet au front-end d'afficher un message utile, et on garde 500 pour les vrais bugs.
+- Point à retravailler : les familles de codes HTTP, découvertes pendant cette séance.
+
 **Reprise de la prochaine séance**
-- Partie 2 : route d'inscription.
+- Partie 3 : route de connexion avec JWT.
