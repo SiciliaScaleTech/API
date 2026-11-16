@@ -190,7 +190,7 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 - Étape 4 : inscription et connexion, avec hachage du mot de passe (bcrypt).
 - Astuce retenue : après un copier-coller, rechercher l'ancien mot avec `Ctrl+F` pour tout adapter. Désactiver l'autocomplétion pendant les exercices.
 
-### Étape 4 - Inscription et connexion (en cours)
+### Étape 4 - Inscription et connexion
 
 **Ce qui a été fait (2026-11-16)**
 - Installation de `bcrypt` (`npm install bcrypt`) : bibliothèque qui hache les mots de passe avec l'algorithme bcrypt.
@@ -264,5 +264,29 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 - À quoi sert `JWT_SECRET` ? À signer les jetons et à vérifier leur signature. Si un pirate la découvre, il peut fabriquer de faux jetons au nom de n'importe quel utilisateur. D'où une clé longue, aléatoire, dans `.env`, jamais sur Git.
 - Point à retravailler : le rôle de la clé secrète, non retrouvé seule.
 
+**Partie 4 : middleware d'authentification (terminée)**
+- Fichier `src/middlewares/verifierJeton.js`, nommé comme la fonction qu'il contient pour être clair.
+- Un middleware est une fonction qui s'exécute avant la route pour faire un contrôle. Il reçoit `req`, `res` et `next`. `next()` laisse passer la requête vers la route. Sinon, le middleware répond lui-même et la route n'est jamais exécutée.
+- Fonctionnement de `verifierJeton` :
+  1. Lit l'en-tête `Authorization`, qui doit avoir la forme `Bearer <jeton>`. Sinon 401 « Jeton manquant ».
+  2. `jwt.verify` contrôle la signature avec `JWT_SECRET` et la date d'expiration. En cas d'échec, 401 « Jeton invalide ou expiré ».
+  3. Accroche l'id du jeton à la requête (`req.utilisateurId`), puis appelle `next()`.
+- Route protégée `GET /api/auth/moi` : `router.get('/moi', verifierJeton, ...)`. Renvoie l'id, le pseudo, l'email et la bio de la personne connectée, 404 si le compte n'existe plus.
+- Tests avec `curl` : sans jeton 401, faux jeton 401, vrai jeton 200 avec le profil et sans mot de passe. Le jeton a été rangé dans une variable du terminal (`JETON=$(...)`) pour ne pas le recopier à la main.
+
+**Choix techniques et justifications**
+- Jeton dans l'en-tête `Authorization: Bearer` : c'est la convention standard, comprise par tous les outils et front-ends.
+- `algorithms: ['HS256']` dans `jwt.verify` : on impose l'algorithme utilisé à la connexion, pour qu'un pirate ne puisse pas présenter un jeton qui prétend en utiliser un autre.
+- Un seul middleware, réutilisé : pour protéger une route, il suffit de l'ajouter devant. Pas de contrôle recopié dans chaque route.
+- L'id vient du jeton signé, jamais de ce que le client envoie. Sinon, un utilisateur pourrait demander les données d'un autre en changeant l'id. Cette faille s'appelle BOLA (Broken Object Level Authorization), n°1 du OWASP API Top 10.
+
+**Questions de jury, partie 4 (2026-11-16)**
+- C'est quoi un middleware ? Une fonction qui s'exécute avant la route pour faire un contrôle. S'il est d'accord, il appelle `next()` pour passer à la route. Sinon, il répond lui-même, par exemple 401.
+- Pourquoi l'id vient du jeton ? Le jeton est signé, le client ne peut pas le modifier. Il ne peut donc accéder qu'à son propre compte (protection contre BOLA).
+- Points à retravailler : le rôle de `next()` (compris après explication) et la faille BOLA.
+
+**Bilan de l'étape 4**
+- Les 3 critères de validation sont remplis : inscription, connexion, accès refusé sans jeton.
+
 **Reprise de la prochaine séance**
-- Partie 4 : middleware d'authentification (vérifier le jeton avec `jwt.verify` avant les routes protégées).
+- Étape 5 : fonctionnalités du réseau social (publications, commentaires, likes, abonnements).

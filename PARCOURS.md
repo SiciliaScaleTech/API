@@ -32,11 +32,11 @@ Chaque étape se termine par une validation. On ne passe à la suivante qu'une f
 - Validation : création et lecture d'un document de chaque type (réussie le 2026-11-06 avec `scripts/essai-modeles.js`)
 
 ### Étape 4 - Inscription et connexion (Bloc 2, composants métier, sécurité)
-- [ ] Mot de passe haché (bcrypt)
-- [ ] Connexion avec JWT
-- [ ] Middleware d'authentification
-- [ ] Je sais expliquer hachage, salage, JWT, et pourquoi on ne stocke jamais un mot de passe en clair
-- Validation : inscription, connexion, accès refusé sans jeton
+- [x] Mot de passe haché (bcrypt)
+- [x] Connexion avec JWT
+- [x] Middleware d'authentification
+- [x] Je sais expliquer hachage, salage, JWT, et pourquoi on ne stocke jamais un mot de passe en clair (questions faites le 2026-11-16)
+- Validation : inscription, connexion, accès refusé sans jeton (réussie le 2026-11-16 avec `curl`)
 
 ### Étape 5 - Fonctionnalités du réseau social (Bloc 2, composants métier)
 - [ ] Publications : créer, lire, modifier, supprimer (CRUD)

@@ -3,6 +3,9 @@ const Utilisateur = require('../models/Utilisateur');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+const verifierJeton = require('../middlewares/verifierJeton');
+
+
 
 
 // Un routeur : un petit groupe de routes qu'on branchera ensuite dans app.js
@@ -74,6 +77,29 @@ router.post('/connexion', async (req, res) => {
     );
 
     res.json({ jeton });
+  } catch (erreur) {
+    console.error(erreur);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
+
+// GET /api/auth/moi : profil de la personne connectée (route protégée par le jeton)
+router.get('/moi', verifierJeton, async (req, res) => {
+  try {
+    // L'id vient du jeton vérifié par le middleware, pas de ce que le client envoie
+    const utilisateur = await Utilisateur.findById(req.utilisateurId);
+
+    // Le compte a pu être supprimé depuis la création du jeton
+    if (!utilisateur) {
+      return res.status(404).json({ message: 'Utilisateur introuvable' });
+    }
+
+    res.json({
+      id: utilisateur._id,
+      pseudo: utilisateur.pseudo,
+      email: utilisateur.email,
+      bio: utilisateur.bio,
+    });
   } catch (erreur) {
     console.error(erreur);
     res.status(500).json({ message: 'Erreur serveur' });
