@@ -288,5 +288,21 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 **Bilan de l'étape 4**
 - Les 3 critères de validation sont remplis : inscription, connexion, accès refusé sans jeton.
 
+### Étape 5 - Fonctionnalités du réseau social (en cours)
+
+**Découpage**
+- 5a : publications, créer et lire. 5b : modifier et supprimer, seulement ses propres publications. 5c : commentaires. 5d : likes. 5e : abonnements et fil d'actualité.
+
+**Ce qui a été fait (2026-11-17)**
+- Fichier `src/routes/publications.js`, branché dans `app.js` sur `/api/publications`.
+- Un fichier de routes a toujours 3 parties : les imports (seulement les outils utilisés), le routeur (`express.Router()`), l'export (`module.exports`). Les routes se placent entre le routeur et l'export.
+- Route `POST /api/publications`, protégée par `verifierJeton` : prend seulement `contenu` dans le corps, répond 201, ou 400 si le contenu est vide ou trop long.
+
+**Choix techniques et justifications**
+- Adresses au format REST : une adresse par ressource, la méthode HTTP indique l'action (CRUD : POST crée, GET lit, PUT modifie, DELETE supprime).
+- Toutes les routes des publications sont protégées : il faut être connecté pour voir ou écrire, comme sur un réseau privé.
+- L'auteur vient du jeton (`req.utilisateurId`), jamais du corps de la requête. Sinon, n'importe qui pourrait publier au nom d'un autre.
+
 **Reprise de la prochaine séance**
-- Étape 5 : fonctionnalités du réseau social (publications, commentaires, likes, abonnements).
+- Récupérer un jeton (`JETON=$(...)`), puis tester la création d'une publication (201) et la tentative de tricher avec un faux `auteur` (l'auteur doit rester celui du jeton).
+- Ensuite : 5a, routes de lecture (liste et une seule publication).
