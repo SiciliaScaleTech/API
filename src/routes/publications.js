@@ -1,5 +1,6 @@
 // 1. Les imports : les outils dont ce fichier a besoin
 const express = require('express');
+const mongoose = require('mongoose');
 const Publication = require('../models/Publication');
 const verifierJeton = require('../middlewares/verifierJeton');
 
@@ -31,6 +32,42 @@ router.post('/', verifierJeton, async (req, res) => {
   }
 });
 
+// GET /api/publications : liste des publications, les plus récentes d'abord
+router.get('/', verifierJeton, async (req, res) => {
+  try {
+    const publications = await Publication.find()
+      .sort({ createdAt: -1 }) // -1 = ordre décroissant : la plus récente en premier
+      .limit(20) // jamais plus de 20 à la fois, pour ne pas surcharger le serveur
+      .populate('auteur', 'pseudo'); // remplace l'id de l'auteur par son pseudo
+
+    res.json(publications);
+  } catch (erreur) {
+    console.error(erreur);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
+
+// GET /api/publications/:id : une seule publication, choisie par son id
+router.get('/:id', verifierJeton, async (req, res) => {
+  try {
+    // Un id mal formé ne peut correspondre à aucune publication
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(404).json({ message: 'Publication introuvable' });
+    }
+
+    const publication = await Publication.findById(req.params.id).populate('auteur', 'pseudo');
+
+    // Id bien formé, mais aucune publication ne le porte
+    if (!publication) {
+      return res.status(404).json({ message: 'Publication introuvable' });
+    }
+
+    res.json(publication);
+  } catch (erreur) {
+    console.error(erreur);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
 
 // 3. L'export : on donne le routeur à app.js, qui le branchera sur /api/publications
 module.exports = router;

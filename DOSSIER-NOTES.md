@@ -303,6 +303,17 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 - Toutes les routes des publications sont protégées : il faut être connecté pour voir ou écrire, comme sur un réseau privé.
 - L'auteur vient du jeton (`req.utilisateurId`), jamais du corps de la requête. Sinon, n'importe qui pourrait publier au nom d'un autre.
 
+- Tests de la création avec `curl` : publication créée (201), contenu vide refusé (400), sans jeton (401). Tentative de tricher en envoyant un faux `auteur` : il est ignoré, l'auteur enregistré reste celui du jeton.
+- Route `GET /api/publications` : `find()`, tri du plus récent au plus ancien (`sort({ createdAt: -1 })`), 20 au maximum (`limit(20)`), et `populate('auteur', 'pseudo')` pour afficher le pseudo de l'auteur sans ses autres données.
+- Route `GET /api/publications/:id` : l'id est lu dans l'adresse (`req.params.id`). 404 si l'id est mal formé (`mongoose.isValidObjectId`) ou si aucune publication ne le porte.
+- Tests de la lecture avec `curl` : liste (200), une publication (200), id inexistant (404), id mal formé (404), sans jeton (401).
+- Partie 5a terminée.
+
+**Choix techniques et justifications (lecture)**
+- `limit(20)` : on n'envoie jamais toute la base d'un coup, pour ne pas surcharger le serveur (OWASP API Top 10 : consommation de ressources sans limite).
+- `populate` limité au pseudo : on n'expose pas l'email des auteurs.
+- Contrôle de l'id avant la requête : un id mal formé est une erreur du client (404), pas un bug du serveur (500).
+- Incident pendant la séance : l'autocomplétion de VS Code a ajouté seule un `require('./auth')` inutile, et un `router.` inachevé a fait planter le serveur (`Cannot set properties of undefined`). Leçon : relire le haut du fichier après l'autocomplétion, et ne pas taper dans un fichier pendant qu'il est modifié ailleurs.
+
 **Reprise de la prochaine séance**
-- Récupérer un jeton (`JETON=$(...)`), puis tester la création d'une publication (201) et la tentative de tricher avec un faux `auteur` (l'auteur doit rester celui du jeton).
-- Ensuite : 5a, routes de lecture (liste et une seule publication).
+- Partie 5b : modifier et supprimer une publication, seulement si on en est l'auteur (protection BOLA).
