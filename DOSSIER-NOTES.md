@@ -433,5 +433,20 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 **Question de jury, partie 6c (2026-11-17)**
 - Qu'est-ce que la force brute, et comment l'API s'en protège ? Un robot essaie des milliers de mots de passe jusqu'à trouver le bon. L'API limite la connexion à 10 essais par 15 minutes et par IP, puis répond 429 sans vérifier le mot de passe.
 
+**Partie 6d : CORS (terminée)**
+- Les navigateurs appliquent la Same-Origin Policy : une page ne peut lire que les réponses de son propre site. CORS permet à l'API d'indiquer au navigateur quels autres sites sont autorisés, comme une liste d'invités.
+- Installation de `cors`. Configuration dans `app.js` : un seul site autorisé (`origin`), lu dans `.env` (`CORS_ORIGINE=http://localhost:5500`, port de l'extension Live Server). Seulement les méthodes GET, POST, PUT, DELETE et les en-têtes `Content-Type` et `Authorization`.
+- Variable ajoutée aussi dans `.env.example`, sans secret.
+- Tests : depuis `localhost:5500`, le navigateur laisse lire la réponse. Depuis `pirate.exemple`, l'adresse ne correspond pas à `Access-Control-Allow-Origin`, le navigateur bloque. Pré-vérification `OPTIONS` avant un DELETE avec jeton : 204 avec la liste des méthodes et en-têtes autorisés.
+
+**Choix techniques et justifications**
+- Une seule origine autorisée, et seulement les méthodes et en-têtes utiles : principe du moindre privilège.
+- L'adresse est dans `.env` : on la change sans toucher au code (par exemple au déploiement).
+- Limite à connaître : CORS est appliqué par le navigateur. Il protège les utilisateurs contre un site piégé, mais n'empêche pas un appel avec `curl` ou un robot. La vraie protection de l'API reste le jeton, le contrôle d'appartenance et la limitation des requêtes.
+
+**Question de jury, partie 6d (2026-11-17)**
+- À quoi sert CORS, et empêche-t-il un appel avec curl ? Il indique au navigateur quels sites peuvent appeler l'API, pour protéger les utilisateurs contre un site piégé. Il n'empêche pas curl, car c'est le navigateur qui fait le contrôle.
+- Point à retravailler : CORS (non retrouvé seule). Image du videur qui ne travaille que dans les navigateurs.
+
 **Reprise de la prochaine séance**
-- Partie 6d : CORS.
+- Partie 6e : injections NoSQL et taille des requêtes.

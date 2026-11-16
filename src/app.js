@@ -1,5 +1,6 @@
 const express = require('express');
 const helmet = require('helmet');
+const cors = require('cors');
 const { limiteurGeneral } = require('./middlewares/limiteurs');
 const authRoutes = require('./routes/auth.js');
 const publicationsRoutes = require('./routes/publications.js');
@@ -9,6 +10,15 @@ const app = express();
 // Sécurité : en-têtes de protection sur chaque réponse, et suppression de X-Powered-By
 // Placé en premier pour s'appliquer à toutes les réponses, même aux erreurs
 app.use(helmet());
+
+// Sécurité : CORS. Seul le site indiqué dans .env (notre front-end) peut appeler l'API depuis un navigateur
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGINE, // l'adresse autorisée, une seule
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // les méthodes utilisées par nos routes
+    allowedHeaders: ['Content-Type', 'Authorization'], // les en-têtes que le front a le droit d'envoyer
+  })
+);
 
 // Sécurité : pas plus de 100 requêtes par 15 minutes et par adresse IP sur toute l'API
 app.use('/api', limiteurGeneral);
