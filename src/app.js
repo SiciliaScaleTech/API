@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
@@ -19,6 +20,10 @@ app.use(
     allowedHeaders: ['Content-Type', 'Authorization'], // les en-têtes que le front a le droit d'envoyer
   })
 );
+
+// Front-end : les fichiers du dossier public/ (HTML, CSS, JS) sont envoyés tels quels au navigateur
+// path.join construit le chemin vers public/, quel que soit le dossier d'où on lance le serveur
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // Sécurité : pas plus de 100 requêtes par 15 minutes et par adresse IP sur toute l'API
 app.use('/api', limiteurGeneral);

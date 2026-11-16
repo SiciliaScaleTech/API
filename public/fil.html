@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Réseau - Fil d'actualité</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="entete">
+    <a href="/fil.html" class="logo">Réseau</a>
+    <nav class="entete-droite">
+      <a href="/profil.html" class="lien-profil" id="mon-pseudo">sicilia</a>
+      <button type="button" class="bouton-contour" id="deconnexion">Déconnexion</button>
+    </nav>
+  </header>
+
+  <div class="mise-en-page">
+    <main class="colonne">
+      <!-- Onglets du fil -->
+      <div class="onglets" role="tablist">
+        <button type="button" class="onglet actif" id="onglet-fil" role="tab" aria-selected="true">Mon fil</button>
+        <button type="button" class="onglet" id="onglet-decouvrir" role="tab" aria-selected="false">Découvrir</button>
+      </div>
+
+      <!-- Zone de publication -->
+      <form class="carte publier" id="form-publier">
+        <label for="contenu" class="visuellement-cache">Votre publication</label>
+        <textarea id="contenu" name="contenu" rows="3" maxlength="500" required placeholder="Quoi de neuf ?"></textarea>
+        <div class="publier-bas">
+          <span class="compteur" id="compteur">0 / 500</span>
+          <button type="submit" class="bouton petit">Publier</button>
+        </div>
+      </form>
+
+      <p class="message" id="message" aria-live="polite" hidden></p>
+
+      <!-- Liste des publications -->
+      <section id="publications" aria-label="Publications">
+        <!-- Exemples statiques, remplacés par le JavaScript à la partie 8c -->
+        <article class="carte publication">
+          <div class="publication-haut">
+            <a href="/profil.html" class="auteur">bob_essai</a>
+            <time class="date">17/11/2026 14:05</time>
+          </div>
+          <p class="contenu">Bonjour, je suis Bob !</p>
+          <div class="actions">
+            <button type="button" class="bouton-like aime">♥ J'aime 2</button>
+            <span>2 commentaires</span>
+          </div>
+          <div class="commentaires">
+            <p><strong>sicilia</strong> Merci Bob !</p>
+            <p><strong>bob_essai</strong> Avec plaisir</p>
+            <form class="form-commentaire">
+              <label class="visuellement-cache" for="commentaire-exemple">Votre commentaire</label>
+              <input type="text" id="commentaire-exemple" maxlength="300" placeholder="Écrire un commentaire">
+              <button type="submit" class="bouton petit">Envoyer</button>
+            </form>
+          </div>
+        </article>
+
+        <article class="carte publication">
+          <div class="publication-haut">
+            <a href="/profil.html" class="auteur">sicilia</a>
+            <time class="date">16/11/2026 13:10</time>
+          </div>
+          <p class="contenu">Ma première publication, modifiée !</p>
+          <div class="actions">
+            <button type="button" class="bouton-like">♡ J'aime 0</button>
+            <span>0 commentaire</span>
+            <span class="actions-auteur">
+              <button type="button" class="lien">Modifier</button>
+              <button type="button" class="lien danger">Supprimer</button>
+            </span>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <!-- Panneau de droite : visible seulement sur grand écran (voir le CSS) -->
+    <aside class="carte panneau">
+      <div class="avatar" aria-hidden="true">S</div>
+      <p class="panneau-pseudo">sicilia</p>
+      <p>suit 1 membre</p>
+      <a href="/profil.html">Voir mon profil</a>
+    </aside>
+  </div>
+</body>
+</html>

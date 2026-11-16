@@ -1,0 +1,390 @@
+/* =========================================================
+   Feuille de style commune aux 3 pages
+   Approche mobile first : les règles de base sont pour le téléphone,
+   la media query en bas du fichier adapte pour les grands écrans
+   ========================================================= */
+
+/* Variables : les couleurs sont définies une seule fois */
+:root {
+  --fond: #f4f4f4;
+  --carte: #ffffff;
+  --texte: #222222;
+  --texte-doux: #666666;
+  --principal: #333333;
+  --lien: #223355;
+  --danger: #a33333;
+  --fond-erreur: #fde8e8;
+  --fond-succes: #e6f4ea;
+  --bordure: #cccccc;
+}
+
+/* Base */
+* {
+  box-sizing: border-box; /* la largeur inclut les marges intérieures et la bordure */
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: var(--texte);
+  background: var(--fond);
+}
+
+a {
+  color: var(--lien);
+}
+
+h2 {
+  font-size: 1.1rem;
+  margin: 24px 0 12px;
+}
+
+/* Texte lu par les lecteurs d'écran mais invisible à l'écran (accessibilité) */
+.visuellement-cache {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Contour bien visible quand on navigue au clavier (accessibilité) */
+:focus-visible {
+  outline: 3px solid #4a7bd0;
+  outline-offset: 2px;
+}
+
+/* ---------- Boutons ---------- */
+.bouton {
+  display: inline-block;
+  padding: 12px 20px;
+  border: none;
+  background: var(--principal);
+  color: #ffffff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.bouton.petit {
+  padding: 6px 14px;
+  font-size: 0.9rem;
+}
+
+.bouton:hover {
+  background: #000000;
+}
+
+.bouton-contour {
+  padding: 6px 12px;
+  border: 1px solid #ffffff;
+  background: transparent;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+/* Bouton qui ressemble à un lien (Modifier, Supprimer) */
+.lien {
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--lien);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.lien.danger {
+  color: var(--danger);
+}
+
+.bouton-like {
+  padding: 4px 10px;
+  border: 1px solid #999999;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.bouton-like.aime {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+/* ---------- Messages ---------- */
+.message {
+  padding: 10px 12px;
+  margin: 12px 0;
+  background: var(--fond-erreur);
+  color: var(--danger);
+  border: 1px solid #e0a0a0;
+}
+
+.message.succes {
+  background: var(--fond-succes);
+  color: #1e6b35;
+  border-color: #9cd3ac;
+}
+
+/* ---------- Onglets ---------- */
+.onglets {
+  display: flex;
+  margin-bottom: 12px;
+}
+
+.onglet {
+  flex: 1; /* les deux onglets se partagent la largeur */
+  padding: 12px;
+  border: none;
+  border-bottom: 4px solid transparent;
+  background: #e8e8e8;
+  color: var(--texte-doux);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.onglet.actif {
+  background: #ffffff;
+  border-bottom-color: var(--principal);
+  color: var(--principal);
+  font-weight: bold;
+}
+
+/* ---------- Page de connexion ---------- */
+.boite-connexion {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+
+.logo-grand {
+  text-align: center;
+  font-size: 2rem;
+  margin: 0;
+}
+
+.sous-titre {
+  text-align: center;
+  color: var(--texte-doux);
+  margin-bottom: 32px;
+}
+
+.formulaire {
+  display: flex;
+  flex-direction: column;
+}
+
+.formulaire label {
+  margin-top: 16px;
+  margin-bottom: 6px;
+}
+
+.formulaire input {
+  padding: 12px;
+  font-size: 1rem;
+  border: 1px solid #999999;
+}
+
+.formulaire .bouton {
+  margin-top: 24px;
+}
+
+/* ---------- En-tête des pages connectées ---------- */
+.entete {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--principal);
+}
+
+.logo {
+  color: #ffffff;
+  font-size: 1.3rem;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.entete-droite {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lien-profil {
+  color: #ffffff;
+}
+
+/* ---------- Mise en page ---------- */
+.colonne {
+  width: 100%;
+  max-width: 600px; /* au-delà, les lignes deviennent trop longues à lire */
+  margin: 0 auto;
+  padding: 12px;
+}
+
+.carte {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+/* Le panneau de droite est caché sur mobile */
+.panneau {
+  display: none;
+}
+
+/* ---------- Zone de publication ---------- */
+.publier textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  font-family: inherit;
+  border: 1px solid #999999;
+  resize: vertical;
+}
+
+.publier-bas {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.compteur {
+  font-size: 0.85rem;
+  color: var(--texte-doux);
+}
+
+/* ---------- Publications ---------- */
+.publication-haut {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.auteur {
+  font-weight: bold;
+}
+
+.date {
+  font-size: 0.8rem;
+  color: #999999;
+}
+
+.contenu {
+  margin: 10px 0;
+  white-space: pre-wrap; /* garde les retours à la ligne écrits par l'utilisateur */
+  overflow-wrap: anywhere; /* coupe les mots très longs au lieu de déborder */
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.9rem;
+}
+
+.actions-auteur {
+  margin-left: auto; /* pousse Modifier et Supprimer à droite */
+  display: flex;
+  gap: 12px;
+}
+
+.commentaires {
+  margin-top: 10px;
+  padding: 10px;
+  background: var(--fond);
+  font-size: 0.9rem;
+}
+
+.commentaires p {
+  margin: 0 0 8px;
+}
+
+.form-commentaire {
+  display: flex;
+  gap: 8px;
+}
+
+.form-commentaire input {
+  flex: 1;
+  min-width: 0;
+  padding: 6px;
+  border: 1px solid #999999;
+}
+
+.resume {
+  font-size: 0.9rem;
+  color: var(--texte-doux);
+}
+
+/* ---------- Profil ---------- */
+.retour {
+  display: inline-block;
+  margin: 8px 0 16px;
+}
+
+.profil {
+  text-align: center;
+}
+
+.avatar {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: #dddddd;
+  color: var(--texte-doux);
+  font-size: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar.grand {
+  width: 84px;
+  height: 84px;
+  font-size: 2rem;
+}
+
+.profil-pseudo {
+  font-size: 1.4rem;
+  margin: 12px 0 4px;
+}
+
+.profil-bio {
+  color: var(--texte-doux);
+  margin: 0 0 8px;
+}
+
+/* =========================================================
+   Grands écrans (à partir de 1000 px de large)
+   ========================================================= */
+@media (min-width: 1000px) {
+  .mise-en-page {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    padding: 12px;
+  }
+
+  .mise-en-page .colonne {
+    margin: 0;
+  }
+
+  /* Le panneau de droite apparaît */
+  .panneau {
+    display: block;
+    width: 270px;
+    align-self: flex-start;
+    text-align: center;
+  }
+
+  .panneau-pseudo {
+    font-weight: bold;
+    font-size: 1.1rem;
+  }
+}

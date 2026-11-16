@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Réseau - Profil</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="entete">
+    <a href="/fil.html" class="logo">Réseau</a>
+    <nav class="entete-droite">
+      <button type="button" class="bouton-contour" id="deconnexion">Déconnexion</button>
+    </nav>
+  </header>
+
+  <main class="colonne">
+    <a href="/fil.html" class="retour">← Retour au fil</a>
+
+    <!-- Identité du membre (exemple statique, remplacé à la partie 8d) -->
+    <section class="profil">
+      <div class="avatar grand" aria-hidden="true">B</div>
+      <h1 class="profil-pseudo">bob_essai</h1>
+      <p class="profil-bio">Pas encore de bio</p>
+      <p>2 publications · suit 1 membre</p>
+      <button type="button" class="bouton" id="bouton-suivre">Suivre</button>
+    </section>
+
+    <p class="message" id="message" aria-live="polite" hidden></p>
+
+    <h2>Publications</h2>
+    <section id="publications" aria-label="Publications du membre">
+      <article class="carte publication">
+        <time class="date">17/11/2026 14:05</time>
+        <p class="contenu">Bonjour, je suis Bob !</p>
+        <p class="resume">♥ 2 · 2 commentaires</p>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
