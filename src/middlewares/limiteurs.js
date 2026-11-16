@@ -1,9 +1,10 @@
 const rateLimit = require('express-rate-limit');
 
-// Limite générale : 100 requêtes par 15 minutes pour chaque adresse IP, sur toute l'API
+// Limite générale : 300 requêtes par 15 minutes pour chaque adresse IP, sur toute l'API
+// (un membre qui navigue normalement en fait quelques dizaines, un robot des milliers)
 const limiteurGeneral = rateLimit({
   windowMs: 15 * 60 * 1000, // la période : 15 minutes, en millisecondes
-  limit: 100, // nombre de requêtes autorisées pendant cette période
+  limit: 300, // nombre de requêtes autorisées pendant cette période
   standardHeaders: 'draft-8', // indique au client combien de requêtes il lui reste
   legacyHeaders: false, // pas d'anciens en-têtes en double
   message: { message: 'Trop de requêtes, réessayez plus tard' },

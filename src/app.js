@@ -25,7 +25,7 @@ app.use(
 // path.join construit le chemin vers public/, quel que soit le dossier d'où on lance le serveur
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
-// Sécurité : pas plus de 100 requêtes par 15 minutes et par adresse IP sur toute l'API
+// Sécurité : pas plus de 300 requêtes par 15 minutes et par adresse IP sur toute l'API
 app.use('/api', limiteurGeneral);
 
 // Lecture du JSON dans le corps des requêtes, 10 Ko au maximum

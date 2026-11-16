@@ -52,37 +52,10 @@ async function chargerPublications() {
     return;
   }
 
+  // creerCartePublication est dans cartes.js, partagé avec la page profil
   for (const publication of publications) {
-    zonePublications.append(creerCartePublication(publication));
+    zonePublications.append(creerCartePublication(publication, moi, chargerPublications));
   }
-}
-
-// Fabrique la carte HTML d'une publication, avec createElement et textContent (jamais innerHTML)
-function creerCartePublication(publication) {
-  const article = creerElement('article', 'carte publication');
-
-  // Ligne du haut : auteur (lien vers son profil) et date
-  const haut = creerElement('div', 'publication-haut');
-  if (publication.auteur) {
-    const lienAuteur = creerElement('a', 'auteur', publication.auteur.pseudo);
-    lienAuteur.href = '/profil.html?id=' + publication.auteur._id;
-    haut.append(lienAuteur);
-  } else {
-    haut.append(creerElement('span', 'auteur', 'Compte supprimé'));
-  }
-  haut.append(creerElement('time', 'date', formaterDate(publication.createdAt)));
-  article.append(haut);
-
-  // Le texte de la publication
-  article.append(creerElement('p', 'contenu', publication.contenu));
-
-  // Les actions (likes, commentaires, modifier, supprimer) : ajoutées à la partie 8d
-  const actions = creerElement('div', 'actions');
-  const nombreLikes = publication.likes.length;
-  actions.append(creerElement('span', '', '♥ ' + nombreLikes + ' j\'aime'));
-  article.append(actions);
-
-  return article;
 }
 
 // ---------- Les onglets ----------

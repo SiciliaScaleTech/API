@@ -9,7 +9,7 @@ Ce document présente les mesures de sécurité de l'API de réseau social et le
 | API1 : autorisation défaillante au niveau des objets (BOLA) | Oui | Contrôle d'appartenance avant toute modification ou suppression (403). L'identité vient toujours du jeton, jamais de la requête. |
 | API2 : authentification défaillante | Oui | Mots de passe hachés avec bcrypt, 8 caractères minimum. Jetons JWT signés, valables 1 heure. Message identique pour un email inconnu et un mauvais mot de passe. 10 tentatives de connexion par 15 minutes. |
 | API3 : autorisation défaillante au niveau des propriétés | Oui | Seuls les champs attendus sont lus dans les requêtes. Les réponses ne contiennent que des champs choisis, jamais le mot de passe. |
-| API4 : consommation de ressources sans limite | Oui | 100 requêtes par 15 minutes et par IP. Corps de requête limité à 10 Ko. Listes limitées à 20 publications ou 50 commentaires. |
+| API4 : consommation de ressources sans limite | Oui | 300 requêtes par 15 minutes et par IP. Corps de requête limité à 10 Ko. Listes limitées à 20 publications ou 50 commentaires. |
 | API5 : autorisation défaillante au niveau des fonctions | Non | L'API n'a pas de fonctions d'administration. Tous les membres ont les mêmes droits. |
 | API6 : accès sans limite aux processus métier sensibles | En partie | L'inscription est limitée à 10 essais par 15 minutes, contre la création de comptes en masse. |
 | API7 : falsification de requêtes côté serveur (SSRF) | Non | L'API n'appelle aucune adresse fournie par un utilisateur. |
@@ -42,7 +42,7 @@ Ce document présente les mesures de sécurité de l'API de réseau social et le
 - Les identifiants reçus dans les adresses sont vérifiés avant toute recherche (404 s'ils sont mal formés).
 
 ### Limitation des requêtes
-- 100 requêtes par 15 minutes et par IP sur toute l'API.
+- 300 requêtes par 15 minutes et par IP sur toute l'API.
 - 10 tentatives par 15 minutes pour la connexion et l'inscription, contre la force brute.
 - Au-delà : réponse 429 et en-tête `Retry-After`.
 

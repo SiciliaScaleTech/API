@@ -316,6 +316,21 @@ h2 {
   border: 1px solid #999999;
 }
 
+/* Champ de modification d'une publication */
+.modification textarea {
+  width: 100%;
+  margin: 10px 0 0;
+  padding: 10px;
+  font-size: 1rem;
+  font-family: inherit;
+  border: 1px solid #999999;
+}
+
+.modification .publier-bas {
+  justify-content: flex-end;
+  gap: 16px;
+}
+
 .resume {
   font-size: 0.9rem;
   color: var(--texte-doux);

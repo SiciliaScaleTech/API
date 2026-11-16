@@ -2,10 +2,59 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const Utilisateur = require('../models/Utilisateur');
+const Publication = require('../models/Publication');
 const verifierJeton = require('../middlewares/verifierJeton');
 
 // 2. Le routeur : le groupe des routes des utilisateurs
 const router = express.Router();
+
+// GET /api/utilisateurs/:id : profil public d'un membre
+router.get('/:id', verifierJeton, async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(404).json({ message: 'Utilisateur introuvable' });
+    }
+
+    const utilisateur = await Utilisateur.findById(req.params.id);
+    if (!utilisateur) {
+      return res.status(404).json({ message: 'Utilisateur introuvable' });
+    }
+
+    // Nombre de publications de ce membre, compté directement par MongoDB
+    const nombrePublications = await Publication.countDocuments({ auteur: utilisateur._id });
+
+    // Profil PUBLIC : jamais l'email, qui est une donnée personnelle (OWASP API3)
+    res.json({
+      id: utilisateur._id,
+      pseudo: utilisateur.pseudo,
+      bio: utilisateur.bio,
+      nombreAbonnements: utilisateur.abonnements.length,
+      nombrePublications,
+    });
+  } catch (erreur) {
+    console.error(erreur);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
+
+// GET /api/utilisateurs/:id/publications : les publications d'un membre, les plus récentes d'abord
+router.get('/:id/publications', verifierJeton, async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(404).json({ message: 'Utilisateur introuvable' });
+    }
+
+    const publications = await Publication.find({ auteur: req.params.id })
+      .sort({ createdAt: -1 })
+      .limit(20)
+      .populate('auteur', 'pseudo');
+
+    res.json(publications);
+  } catch (erreur) {
+    console.error(erreur);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
 
 
 // POST /api/utilisateurs/:id/abonnement : suivre l'utilisateur :id
