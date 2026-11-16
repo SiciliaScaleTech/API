@@ -215,5 +215,54 @@ router.delete('/:id/commentaires/:commentaireId', verifierJeton, async (req, res
   }
 });
 
+// POST /api/publications/:id/like : aimer une publication
+router.post('/:id/like', verifierJeton, async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(404).json({ message: 'Publication introuvable' });
+    }
+
+    // $addToSet : ajoute l'id dans la liste seulement s'il n'y est pas déjà (pas de double like)
+    const publication = await Publication.findByIdAndUpdate(
+      req.params.id,
+      { $addToSet: { likes: req.utilisateurId } },
+      { returnDocument: 'after' } // renvoie la publication telle qu'elle est après la modification
+    );
+    if (!publication) {
+      return res.status(404).json({ message: 'Publication introuvable' });
+    }
+
+    res.json({ message: 'Publication aimée', nombreDeLikes: publication.likes.length });
+  } catch (erreur) {
+    console.error(erreur);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
+
+// DELETE /api/publications/:id/like : ne plus aimer une publication
+router.delete('/:id/like', verifierJeton, async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(404).json({ message: 'Publication introuvable' });
+    }
+
+    // $pull : retire l'id de la personne connectée de la liste des likes
+    const publication = await Publication.findByIdAndUpdate(
+      req.params.id,
+      { $pull: { likes: req.utilisateurId } },
+      { returnDocument: 'after' } // renvoie la publication telle qu'elle est après la modification
+    );
+    if (!publication) {
+      return res.status(404).json({ message: 'Publication introuvable' });
+    }
+
+    res.json({ message: 'Like retiré', nombreDeLikes: publication.likes.length });
+  } catch (erreur) {
+    console.error(erreur);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
+
+
 // 3. L'export : on donne le routeur à app.js, qui le branchera sur /api/publications
 module.exports = router;

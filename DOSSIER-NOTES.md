@@ -353,5 +353,23 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 - Pourquoi supprimer les commentaires avec la publication ? Sinon ils restent orphelins dans la base.
 - Point à retravailler : l'auteur d'un commentaire est la personne du jeton, pas l'auteur de la publication.
 
+**Partie 5d : les likes (terminée)**
+- `POST /api/publications/:id/like` : aimer. `DELETE /api/publications/:id/like` : ne plus aimer. La route DELETE a été écrite par Sicilia à partir de la route POST.
+- La liste `likes` de la publication est modifiée directement dans MongoDB avec `findByIdAndUpdate` :
+  - `$addToSet` ajoute l'id seulement s'il n'est pas déjà dans la liste, donc pas de double like
+  - `$pull` retire l'id de la liste
+- `returnDocument: 'after'` : renvoie la publication après la modification, pour avoir le bon nombre de likes.
+- La réponse donne seulement le nombre de likes (`likes.length`), pas la liste des id.
+- Tests avec `curl` : Bob aime 3 fois et le compteur reste à 1, Sicilia aime (2), Bob retire son like (1), Bob retire une deuxième fois (toujours 1), publication inexistante (404).
+
+**Choix techniques et justifications**
+- `$addToSet` plutôt que vérifier puis ajouter en deux temps : la règle « un seul like par personne » est garantie par MongoDB en une seule opération.
+- L'id ajouté vient du jeton : on ne peut aimer qu'en son propre nom.
+- Pas de contrôle d'auteur (pas de 403) : tout membre connecté a le droit d'aimer n'importe quelle publication.
+
+**Questions de jury, partie 5d (2026-11-17)**
+- Pourquoi un utilisateur ne peut-il pas aimer deux fois ? `$addToSet` ajoute son id dans la liste des likes seulement s'il n'y est pas déjà.
+- Leçon : un commentaire doit toujours dire la même chose que le code. Un commentaire faux est pire que pas de commentaire.
+
 **Reprise de la prochaine séance**
-- Partie 5d : les likes.
+- Partie 5e : abonnements et fil d'actualité.
