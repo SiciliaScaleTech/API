@@ -288,7 +288,7 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 **Bilan de l'étape 4**
 - Les 3 critères de validation sont remplis : inscription, connexion, accès refusé sans jeton.
 
-### Étape 5 - Fonctionnalités du réseau social (en cours)
+### Étape 5 - Fonctionnalités du réseau social
 
 **Découpage**
 - 5a : publications, créer et lire. 5b : modifier et supprimer, seulement ses propres publications. 5c : commentaires. 5d : likes. 5e : abonnements et fil d'actualité.
@@ -371,5 +371,28 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 - Pourquoi un utilisateur ne peut-il pas aimer deux fois ? `$addToSet` ajoute son id dans la liste des likes seulement s'il n'y est pas déjà.
 - Leçon : un commentaire doit toujours dire la même chose que le code. Un commentaire faux est pire que pas de commentaire.
 
+**Partie 5e : abonnements et fil d'actualité (terminée)**
+- Nouveau fichier `src/routes/utilisateurs.js`, branché sur `/api/utilisateurs`. Carcasse écrite par Sicilia.
+- `POST /api/utilisateurs/:id/abonnement` : suivre. `DELETE /api/utilisateurs/:id/abonnement` : ne plus suivre. On modifie la liste `abonnements` de la personne du jeton avec `$addToSet` et `$pull`.
+- Règles métier : on ne peut pas se suivre soi-même (400), on ne peut suivre qu'un utilisateur qui existe (404, contrôle avec `Utilisateur.exists`).
+- `GET /api/publications/fil` : récupère l'utilisateur du jeton, fait la liste des auteurs (ses abonnements plus lui-même, avec `concat`), puis cherche les publications de ces auteurs (`$in`), les plus récentes d'abord, 20 au maximum.
+- La route `/fil` est placée avant `/:id` : Express teste les routes de haut en bas et prend la première qui correspond.
+- Tests avec `curl` : fil avant et après l'abonnement à Bob (sa publication apparaît), double abonnement (compteur à 1), se suivre soi-même (400), utilisateur inexistant (404), désabonnement (200), fil sans jeton (401), lecture d'une publication par id toujours fonctionnelle.
+- Incident : `require('../models/Utilisateurs')` au lieu de `Utilisateur` a fait planter le serveur (`Cannot find module`). Sous Linux, les noms de fichiers sont sensibles aux majuscules et à chaque lettre.
+
+**Choix techniques et justifications**
+- La liste modifiée est toujours celle de la personne du jeton : personne ne peut ajouter un abonnement dans la liste d'un autre.
+- Les abonnements sont stockés comme une liste de références dans l'utilisateur (choix fait à l'étape 3).
+- Convention : les modèles s'écrivent avec une majuscule (`Utilisateur`, `Publication`), les adresses des ressources au pluriel (`/api/utilisateurs`).
+
+**Questions de jury, partie 5e (2026-11-17)**
+- Comment est construit le fil ? Le serveur récupère l'utilisateur grâce au jeton, fait la liste des personnes qu'il suit plus lui-même, puis cherche les publications de ces personnes, les plus récentes d'abord, 20 au maximum.
+- Pourquoi `/fil` avant `/:id` ? Express prend la première route qui correspond. Sinon, "fil" serait pris pour un id de publication.
+- Point à retravailler : la construction du fil (non retrouvée seule).
+
+**Bilan de l'étape 5**
+- Toutes les fonctionnalités sont en place et testées, y compris les cas interdits : CRUD des publications, commentaires, likes, abonnements, fil d'actualité, et contrôle d'appartenance (403).
+- Comptes de test : `sicilia` et `bob_essai`.
+
 **Reprise de la prochaine séance**
-- Partie 5e : abonnements et fil d'actualité.
+- Étape 6 : sécurisation (helmet, CORS, limitation des requêtes, erreurs, OWASP API Top 10).

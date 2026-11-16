@@ -39,11 +39,11 @@ Chaque étape se termine par une validation. On ne passe à la suivante qu'une f
 - Validation : inscription, connexion, accès refusé sans jeton (réussie le 2026-11-16 avec `curl`)
 
 ### Étape 5 - Fonctionnalités du réseau social (Bloc 2, composants métier)
-- [ ] Publications : créer, lire, modifier, supprimer (CRUD)
-- [ ] Commentaires et likes
-- [ ] Abonnements entre utilisateurs, fil d'actualité
-- [ ] Un utilisateur ne peut modifier que ses propres contenus
-- Validation : tests de chaque route, y compris les cas interdits
+- [x] Publications : créer, lire, modifier, supprimer (CRUD)
+- [x] Commentaires et likes
+- [x] Abonnements entre utilisateurs, fil d'actualité
+- [x] Un utilisateur ne peut modifier que ses propres contenus
+- Validation : tests de chaque route, y compris les cas interdits (réussie le 2026-11-17 avec `curl` et deux comptes de test)
 
 ### Étape 6 - Sécurisation (Bloc 2)
 - [ ] Validation des entrées et protection contre l'injection NoSQL

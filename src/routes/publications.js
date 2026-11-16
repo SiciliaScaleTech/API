@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const Publication = require('../models/Publication');
 const Commentaire = require('../models/Commentaire');
+const Utilisateur = require('../models/Utilisateur');
 const verifierJeton = require('../middlewares/verifierJeton');
 
 // 2. Le routeur : le groupe des routes des publications
@@ -40,6 +41,30 @@ router.get('/', verifierJeton, async (req, res) => {
       .sort({ createdAt: -1 }) // -1 = ordre décroissant : la plus récente en premier
       .limit(20) // jamais plus de 20 à la fois, pour ne pas surcharger le serveur
       .populate('auteur', 'pseudo'); // remplace l'id de l'auteur par son pseudo
+
+    res.json(publications);
+  } catch (erreur) {
+    console.error(erreur);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
+
+// GET /api/publications/fil : fil d'actualité, mes publications et celles des gens que je suis
+// Attention : cette route doit rester AVANT '/:id', sinon Express prendrait "fil" pour un id
+router.get('/fil', verifierJeton, async (req, res) => {
+  try {
+    const moi = await Utilisateur.findById(req.utilisateurId);
+    if (!moi) {
+      return res.status(404).json({ message: 'Utilisateur introuvable' });
+    }
+
+    // Les auteurs du fil : les personnes que je suis, plus moi-même
+    const auteurs = moi.abonnements.concat(moi._id);
+
+    const publications = await Publication.find({ auteur: { $in: auteurs } }) // $in = "fait partie de la liste"
+      .sort({ createdAt: -1 })
+      .limit(20)
+      .populate('auteur', 'pseudo');
 
     res.json(publications);
   } catch (erreur) {
