@@ -417,5 +417,21 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 - Tests avec `curl` : JSON mal formé (400 en JSON, plus de chemins de fichiers), adresse inexistante (404 en JSON), route normale (200).
 - Question de jury : pourquoi ne pas renvoyer le détail d'une erreur ? Il révèle les chemins des fichiers, les bibliothèques, parfois du code, ce qui aide un pirate à préparer son attaque. Le détail reste dans le terminal du serveur, le client reçoit un message court.
 
+**Partie 6c : limitation du nombre de requêtes (terminée)**
+- Installation de `express-rate-limit` : middleware qui compte les requêtes de chaque adresse IP sur une période, et répond 429 Too Many Requests au-delà de la limite, sans exécuter la route.
+- Fichier `src/middlewares/limiteurs.js`, deux limites :
+  - `limiteurGeneral` : 100 requêtes par 15 minutes sur tout `/api` (dans `app.js`)
+  - `limiteurAuth` : 10 essais par 15 minutes, placé devant les routes de connexion et d'inscription (dans `auth.js`)
+- Test : 12 tentatives de connexion avec un mauvais mot de passe. Les 10 premières donnent 401, les suivantes 429. Les autres routes restent accessibles. Les en-têtes `RateLimit` et `Retry-After` indiquent au client quand réessayer.
+- Le compteur est gardé en mémoire : il se remet à zéro au redémarrage du serveur. Avec plusieurs serveurs en production, il faudrait un stockage partagé.
+
+**Choix techniques et justifications**
+- Limite stricte sur la connexion contre la force brute : 10 essais par quart d'heure rendent impossible le test de milliers de mots de passe.
+- Limite sur l'inscription contre la création de comptes en masse par un robot.
+- Limite générale contre la surcharge de l'API (OWASP API Top 10 : consommation de ressources sans limite).
+
+**Question de jury, partie 6c (2026-11-17)**
+- Qu'est-ce que la force brute, et comment l'API s'en protège ? Un robot essaie des milliers de mots de passe jusqu'à trouver le bon. L'API limite la connexion à 10 essais par 15 minutes et par IP, puis répond 429 sans vérifier le mot de passe.
+
 **Reprise de la prochaine séance**
-- Partie 6c : limitation du nombre de requêtes.
+- Partie 6d : CORS.

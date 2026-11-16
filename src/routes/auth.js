@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const verifierJeton = require('../middlewares/verifierJeton');
+const { limiteurAuth } = require('../middlewares/limiteurs');
 
 
 
@@ -14,7 +15,8 @@ const router = express.Router();
 
 
 // POST /api/auth/inscription : créer un nouveau compte
-router.post('/inscription', async (req, res) => {
+// limiteurAuth : 10 essais par 15 minutes, contre la création de comptes en masse
+router.post('/inscription', limiteurAuth, async (req, res) => {
   try {
     // On ne prend que les 3 champs attendus, rien d'autre
     const { pseudo, email, motDePasse } = req.body || {};
@@ -45,7 +47,8 @@ router.post('/inscription', async (req, res) => {
 });
 
 // POST /api/auth/connexion : vérifier l'email et le mot de passe
-router.post('/connexion', async (req, res) => {
+// limiteurAuth : 10 essais par 15 minutes, contre la force brute sur les mots de passe
+router.post('/connexion', limiteurAuth, async (req, res) => {
   try {
     const { email, motDePasse } = req.body || {};
 

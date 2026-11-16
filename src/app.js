@@ -1,5 +1,6 @@
 const express = require('express');
 const helmet = require('helmet');
+const { limiteurGeneral } = require('./middlewares/limiteurs');
 const authRoutes = require('./routes/auth.js');
 const publicationsRoutes = require('./routes/publications.js');
 const utilisateursRoutes = require('./routes/utilisateurs.js');
@@ -8,6 +9,9 @@ const app = express();
 // Sécurité : en-têtes de protection sur chaque réponse, et suppression de X-Powered-By
 // Placé en premier pour s'appliquer à toutes les réponses, même aux erreurs
 app.use(helmet());
+
+// Sécurité : pas plus de 100 requêtes par 15 minutes et par adresse IP sur toute l'API
+app.use('/api', limiteurGeneral);
 
 // Lecture du JSON dans le corps des requêtes
 app.use(express.json());
