@@ -7,11 +7,13 @@ const connecterBase = require('../src/config/db');
 const Utilisateur = require('../src/models/Utilisateur');
 const Publication = require('../src/models/Publication');
 const Commentaire = require('../src/models/Commentaire');
+const bcrypt = require('bcrypt');
 
 async function essai() {
   await connecterBase();
 
-  // 1. Créer un utilisateur (faux mot de passe : il n'est pas encore haché)
+  // 1. Créer un utilisateur (le hook pre('save') va hacher le mot de passe)
+
   const alice = await Utilisateur.create({
     pseudo: 'essai_alice',
     email: 'Essai.Alice@Exemple.fr', // majuscules exprès : lowercase doit les enlever
@@ -47,6 +49,17 @@ async function essai() {
   // 5. Le mot de passe ne doit pas revenir dans une recherche (select: false)
   const aliceRelue = await Utilisateur.findById(alice._id);
   console.log('\n5. Mot de passe renvoyé par la recherche ?', aliceRelue.motDePasse);
+
+    // 5b. Relire en demandant explicitement le mot de passe, pour vérifier le hachage
+  const aliceAvecMdp = await Utilisateur.findById(alice._id).select('+motDePasse');
+  console.log('5b. Mot de passe stocké dans la base :', aliceAvecMdp.motDePasse);
+
+  // Vérifier avec le bon mot de passe, puis avec un mauvais
+  const bon = await bcrypt.compare('pas-un-vrai-mot-de-passe', aliceAvecMdp.motDePasse);
+  const mauvais = await bcrypt.compare('MauvaisMotDePasse', aliceAvecMdp.motDePasse);
+  console.log('    Bon mot de passe accepté ?', bon);
+  console.log('    Mauvais mot de passe accepté ?', mauvais);
+
 
   // 6. Une donnée invalide doit être refusée par le schéma
   try {

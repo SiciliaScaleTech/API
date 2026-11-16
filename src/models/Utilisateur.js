@@ -1,5 +1,8 @@
 const mongoose = require('mongoose');
 
+const bcrypt = require('bcrypt');
+
+
 // Schéma : la forme que doit avoir chaque document "utilisateur"
 const utilisateurSchema = new mongoose.Schema(
   {
@@ -39,6 +42,16 @@ const utilisateurSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+// Hook : s'exécute automatiquement avant chaque enregistrement d'un utilisateur
+utilisateurSchema.pre('save', async function () {
+  // Si le mot de passe n'a pas changé, on ne le hache pas une seconde fois
+  if (!this.isModified('motDePasse')) return;
+
+  // On remplace le mot de passe par son empreinte (coût 12)
+  this.motDePasse = await bcrypt.hash(this.motDePasse, 12);
+});
+
 
 // Modèle : l'outil qui permet de lire et écrire dans la collection "utilisateurs"
 module.exports = mongoose.model('Utilisateur', utilisateurSchema);

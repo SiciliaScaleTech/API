@@ -189,3 +189,35 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 **Suite**
 - Étape 4 : inscription et connexion, avec hachage du mot de passe (bcrypt).
 - Astuce retenue : après un copier-coller, rechercher l'ancien mot avec `Ctrl+F` pour tout adapter. Désactiver l'autocomplétion pendant les exercices.
+
+### Étape 4 - Inscription et connexion (en cours)
+
+**Ce qui a été fait (2026-11-16)**
+- Installation de `bcrypt` (`npm install bcrypt`) : bibliothèque qui hache les mots de passe avec l'algorithme bcrypt.
+- Essai : le même mot de passe haché deux fois donne deux empreintes différentes, grâce au sel aléatoire.
+- Lecture d'une empreinte bcrypt : `$2b$` (version), `12$` (coût), 22 caractères de sel, puis 31 caractères d'empreinte. Le sel n'est pas un secret, il est stocké dans l'empreinte pour que `bcrypt.compare` puisse refaire le calcul.
+- Hook `pre('save')` ajouté dans `src/models/Utilisateur.js` par Sicilia : le mot de passe est haché automatiquement avant chaque enregistrement.
+
+**Choix techniques et justifications**
+- Hachage et non chiffrement : un mot de passe ne doit jamais pouvoir être retrouvé, même par nous.
+- bcrypt plutôt que SHA-256 : SHA-256 est rapide, donc facile à attaquer par force brute. bcrypt est lent exprès (coût 12, soit 2 puissance 12 tours) et gère le sel tout seul.
+- Hachage dans le modèle plutôt que dans la route : impossible de l'oublier si on ajoute plus tard une route de changement de mot de passe.
+- `function` et non fonction fléchée dans le hook : Mongoose place le document dans `this`, qu'une fonction fléchée n'a pas.
+- Test `isModified('motDePasse')` : sans lui, modifier la bio hacherait l'empreinte elle-même et bloquerait le compte.
+
+- Test ajouté dans `scripts/essai-modeles.js` (étape 5b) : relecture du mot de passe avec `select('+motDePasse')`, puis `bcrypt.compare` avec le bon et un mauvais mot de passe.
+- Résultat obtenu : l'empreinte stockée commence par `$2b$12$`, le bon mot de passe donne `true`, le mauvais donne `false`. Le mot de passe en clair n'apparaît jamais dans la base.
+- Partie 1 (hachage) terminée.
+
+**Fonctionnement de `bcrypt.compare(motDePasseTapé, empreinte)`**
+- bcrypt relit le sel écrit dans l'empreinte, hache le mot de passe tapé avec ce même sel, puis compare les deux résultats.
+- On ne « déchiffre » donc jamais rien : on refait le calcul et on compare.
+
+**Questions de jury (2026-11-16)**
+- Pourquoi hacher et non chiffrer ? Le chiffrement est réversible : si la base et la clé sont volées, on retrouve les mots de passe. Le hachage est à sens unique. Pour vérifier une connexion, il suffit de comparer les empreintes.
+- Pourquoi deux empreintes différentes pour le même mot de passe ? À cause du sel aléatoire. Ça empêche de repérer deux mots de passe identiques et rend inutiles les tables d'empreintes précalculées. Le sel est stocké dans l'empreinte, c'est ce qui permet à `compare` de vérifier.
+- À quoi sert `select: false` ? Il cache le mot de passe dans toutes les recherches par défaut, pour ne jamais l'envoyer par erreur au navigateur. On le demande seulement à la connexion, avec `select('+motDePasse')`.
+- Point à retravailler : la question 3 (`select: false`) n'a pas été retrouvée seule.
+
+**Reprise de la prochaine séance**
+- Partie 2 : route d'inscription.
