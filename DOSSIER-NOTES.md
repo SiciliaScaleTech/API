@@ -484,7 +484,7 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 ### Étape 7 - Base de données relationnelle
 
 **Décision (2026-11-18)**
-- La compétence « mettre en place une base de données relationnelle » est couverte par le projet InfoStock (PHP et MySQL). Il contient les diagrammes de conception, la création des tables et les requêtes SQL.
+- La compétence « mettre en place une base de données relationnelle » est couverte par le projet InfoStock (PHP et MySQL). Il contient les diagrammes de conception, la création des tables et les requêtes SQL. Vérifié par Sicilia le 2026-11-18.
 - Cette API reste en MongoDB. Elle couvre la compétence « accès aux données NoSQL ».
 
 **Justification**
@@ -499,6 +499,7 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 **Pour l'oral : comparer les deux projets**
 - InfoStock : données très structurées (stocks, produits), relations strictes entre tables, d'où une base relationnelle.
 - Réseau social : contenus de forme souple, listes intégrées dans les documents (likes, abonnements), d'où MongoDB.
+- Réponse de Sicilia (2026-11-18) : InfoStock utilise MySQL pour les liens précis entre les tables (fournisseurs, produits). Le réseau social utilise MongoDB car les publications et commentaires peuvent être très nombreux, et MongoDB peut se répartir sur plusieurs serveurs (scalabilité horizontale). À compléter par la souplesse des documents : likes et abonnements rangés à l'intérieur, sans table de liaison.
 
 **Reprise de la prochaine séance**
 - Étape 8 : interface front-end.
