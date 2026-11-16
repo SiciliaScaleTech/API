@@ -523,5 +523,34 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 **Question de jury, partie 8a (2026-11-18)**
 - Pourquoi faire des maquettes avant de coder ? Pour voir à quoi ressemblera le site, choisir les bons outils, éviter les oublis pendant le code. Modifier une maquette est plus simple que modifier du code. On ne code qu'une fois la maquette validée. Réponse donnée seule, complète.
 
+**Partie 8b : pages HTML et CSS statiques (terminée)**
+- `public/index.html` (connexion et inscription), `public/fil.html`, `public/profil.html`, et une feuille de style commune `public/css/style.css`.
+- Envoyées par Express avec `app.use(express.static(...))` : `/` renvoie `index.html`.
+- HTML sémantique : `header`, `main`, `nav`, `article`, `aside`. Compréhensible par les lecteurs d'écran et les moteurs de recherche.
+- Accessibilité : `lang="fr"`, un `label` relié à chaque champ, `aria-live` sur les zones de message, contour visible au clavier (`:focus-visible`), texte caché pour les lecteurs d'écran (`.visuellement-cache`).
+- `<meta name="viewport">` : indispensable pour un affichage correct sur téléphone.
+- CSS mobile first : règles de base pour le téléphone, puis `@media (min-width: 1000px)` pour les grands écrans (colonne et panneau côte à côte). Variables de couleur dans `:root`. Mise en page avec flexbox.
+- Validation dans le navigateur (`required`, `minlength`, `maxlength`, `type="email"`) : seulement pour le confort de l'utilisateur.
+
+**Question de jury, partie 8b (2026-11-18)**
+- `required` et `minlength` suffisent-ils à protéger l'API ? Non. Cette validation se fait chez l'utilisateur, un pirate la contourne avec curl ou les outils du navigateur. La vraie validation est côté serveur (schémas Mongoose). Règle : ne jamais faire confiance à ce qui vient du client.
+
+**Partie 8c : JavaScript, connexion, fil et publication (terminée)**
+- `public/js/api.js` : fonctions partagées. `appelerApi` fait le `fetch`, ajoute le jeton dans l'en-tête `Authorization`, envoie les données en JSON, et lance une erreur avec le message de l'API en cas d'échec. Sur un 401, le jeton est effacé et on revient à la connexion.
+- `public/js/connexion.js` : onglets, connexion, inscription suivie d'une connexion automatique.
+- `public/js/fil.js` : profil de la personne connectée (`/auth/moi`, qui renvoie maintenant aussi la liste des abonnements), onglets « Mon fil » et « Découvrir », publication avec compteur, déconnexion.
+- `evenement.preventDefault()` : empêche le rechargement de la page à l'envoi d'un formulaire.
+- `defer` : le script s'exécute une fois la page chargée.
+- Le jeton est rangé dans `localStorage` pour passer d'une page à l'autre. Il est effacé à la déconnexion et à l'expiration.
+- Tests dans le navigateur, réussis par Sicilia : mauvais mot de passe (message), connexion, Découvrir, publication, `<b>test</b>` affiché comme du texte, déconnexion, inscription.
+
+**Choix techniques et justifications**
+- Affichage avec `createElement` et `textContent`, jamais `innerHTML` : protection contre le XSS. Deuxième barrière : la CSP de helmet (`script-src 'self'`).
+- Une seule fonction `appelerApi` pour tous les appels : jeton, JSON et erreurs gérés à un seul endroit.
+- `localStorage` est lisible par un script de la page, donc exposé en cas de XSS. Le risque est réduit par `textContent`, la CSP et l'expiration du jeton au bout d'une heure.
+
+**Question de jury, partie 8c (2026-11-18)**
+- Pourquoi `textContent` et pas `innerHTML` ? Les publications viennent des utilisateurs. Avec innerHTML, le navigateur interpréterait leur texte comme du HTML, et un pirate pourrait y cacher du code exécuté chez tous les lecteurs du fil (XSS). Avec textContent, le texte est affiché, jamais exécuté. Image : innerHTML lit la recette et la cuisine, textContent la recopie sur un papier.
+
 **Reprise de la prochaine séance**
-- Partie 8b : pages HTML et CSS statiques.
+- Partie 8d : likes, commentaires, modifier, supprimer, profil et abonnements.
