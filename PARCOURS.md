@@ -53,8 +53,8 @@ Chaque étape se termine par une validation. On ne passe à la suivante qu'une f
 - Validation : tentatives d'attaque simples qui échouent (réussie le 2026-11-17 : injections, force brute, JSON mal formé, corps trop gros, mot de passe faible)
 
 ### Étape 7 - Base relationnelle (Bloc 2, base de données relationnelle)
-- [ ] À décider ensemble : quelle partie du projet ou quel autre projet couvre la compétence SQL
-- Rappel : InfoStock (PHP/MySQL) peut déjà la couvrir
+- [x] À décider ensemble : quelle partie du projet ou quel autre projet couvre la compétence SQL
+- Décision du 2026-11-18 : la compétence est couverte par le projet InfoStock (PHP/MySQL), qui contient la conception (diagrammes), la création des tables et les requêtes SQL. Pas de partie SQL ajoutée à cette API.
 
 ### Étape 8 - Interface front-end (Bloc 1)
 - [ ] Maquettes des écrans (connexion, fil d'actualité, profil)

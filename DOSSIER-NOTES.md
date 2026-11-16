@@ -478,5 +478,27 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 **Bilan de l'étape 6**
 - Toutes les tentatives d'attaque simples échouent : injections NoSQL, force brute, JSON mal formé, corps trop gros, mot de passe faible, site tiers (CORS).
 
+**Question de jury, bilan de l'étape 6 (2026-11-18)**
+- Cite deux protections de l'API. Helmet : un middleware qui ajoute à chaque réponse des en-têtes de sécurité et supprime `X-Powered-By`, pour ne pas révéler les technologies utilisées. CORS : indique au navigateur quels sites ont le droit d'utiliser l'API, ce qui protège les utilisateurs contre un site piégé. Réponse donnée seule, complète.
+
+### Étape 7 - Base de données relationnelle
+
+**Décision (2026-11-18)**
+- La compétence « mettre en place une base de données relationnelle » est couverte par le projet InfoStock (PHP et MySQL). Il contient les diagrammes de conception, la création des tables et les requêtes SQL.
+- Cette API reste en MongoDB. Elle couvre la compétence « accès aux données NoSQL ».
+
+**Justification**
+- Un dossier professionnel peut s'appuyer sur plusieurs projets, du moment que chaque compétence est couverte.
+- Ajouter une base SQL à cette API demanderait une nouvelle technologie et un nouveau conteneur, pour un gain faible, avec une échéance au 30 novembre.
+
+**À rassembler depuis InfoStock pour le dossier**
+- Les diagrammes de conception (MCD, MLD ou schéma des tables).
+- Le script SQL de création des tables.
+- Un exemple de requête préparée avec PDO, et son explication (protection contre l'injection SQL).
+
+**Pour l'oral : comparer les deux projets**
+- InfoStock : données très structurées (stocks, produits), relations strictes entre tables, d'où une base relationnelle.
+- Réseau social : contenus de forme souple, listes intégrées dans les documents (likes, abonnements), d'où MongoDB.
+
 **Reprise de la prochaine séance**
-- Étape 7 : décider comment couvrir la compétence base de données relationnelle (SQL).
+- Étape 8 : interface front-end.
