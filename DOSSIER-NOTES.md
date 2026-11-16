@@ -394,5 +394,28 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 - Toutes les fonctionnalités sont en place et testées, y compris les cas interdits : CRUD des publications, commentaires, likes, abonnements, fil d'actualité, et contrôle d'appartenance (403).
 - Comptes de test : `sicilia` et `bob_essai`.
 
+### Étape 6 - Sécurisation (en cours)
+
+**Point de départ (2026-11-17)**
+- Test d'un JSON mal formé : l'API renvoyait une page HTML avec `X-Powered-By: Express`, le chemin complet des fichiers sur le serveur (avec le nom d'utilisateur Linux) et les noms des bibliothèques internes. C'est une fuite d'informations, due au gestionnaire d'erreurs par défaut d'Express.
+- Découpage : 6a helmet, 6b gestion des erreurs, 6c limitation des requêtes, 6d CORS, 6e injections NoSQL et taille des requêtes, 6f bilan OWASP API Top 10.
+
+**Partie 6a : helmet (terminée)**
+- Installation de `helmet` : middleware qui ajoute des en-têtes de sécurité à chaque réponse et supprime `X-Powered-By`. C'est la recommandation de la documentation officielle d'Express.
+- `app.use(helmet())` placé en premier dans `app.js`, pour s'appliquer à toutes les réponses, même aux erreurs.
+- En-têtes principaux :
+  - `Content-Security-Policy` : le navigateur n'exécute que les scripts du site (contre le XSS)
+  - `X-Frame-Options: SAMEORIGIN` : la page ne peut pas être affichée dans un cadre d'un autre site (contre le clickjacking)
+  - `Strict-Transport-Security` : le navigateur utilise toujours HTTPS pendant un an
+  - `X-Content-Type-Options: nosniff` : le navigateur ne devine pas le type d'un fichier
+- Question de jury : à quoi sert helmet, et pourquoi masquer `X-Powered-By` ? Il ajoute des en-têtes de sécurité à chaque réponse. Masquer la technologie évite qu'un pirate cherche directement ses failles connues.
+
+**Partie 6b : gestion des erreurs (terminée)**
+- Deux middlewares ajoutés à la fin de `app.js`, après toutes les routes :
+  - un middleware 404 en JSON : si une requête arrive jusqu'à lui, aucune route ne lui correspond
+  - un gestionnaire d'erreurs à 4 paramètres `(erreur, req, res, next)`, reconnu comme tel par Express. JSON mal formé : 400. Corps trop gros : 413. Toute autre erreur : détail dans le terminal du serveur, « Erreur serveur » (500) pour le client.
+- Tests avec `curl` : JSON mal formé (400 en JSON, plus de chemins de fichiers), adresse inexistante (404 en JSON), route normale (200).
+- Question de jury : pourquoi ne pas renvoyer le détail d'une erreur ? Il révèle les chemins des fichiers, les bibliothèques, parfois du code, ce qui aide un pirate à préparer son attaque. Le détail reste dans le terminal du serveur, le client reçoit un message court.
+
 **Reprise de la prochaine séance**
-- Étape 6 : sécurisation (helmet, CORS, limitation des requêtes, erreurs, OWASP API Top 10).
+- Partie 6c : limitation du nombre de requêtes.
