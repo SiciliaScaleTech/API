@@ -315,5 +315,23 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 - Contrôle de l'id avant la requête : un id mal formé est une erreur du client (404), pas un bug du serveur (500).
 - Incident pendant la séance : l'autocomplétion de VS Code a ajouté seule un `require('./auth')` inutile, et un `router.` inachevé a fait planter le serveur (`Cannot set properties of undefined`). Leçon : relire le haut du fichier après l'autocomplétion, et ne pas taper dans un fichier pendant qu'il est modifié ailleurs.
 
+**Partie 5b : modifier et supprimer, seulement ses propres publications (terminée)**
+- Routes `PUT /api/publications/:id` et `DELETE /api/publications/:id`, protégées par `verifierJeton`.
+- Les deux routes suivent 4 étapes : id bien formé (sinon 404), publication existante (sinon 404), contrôle d'appartenance (sinon 403), puis l'action.
+- Contrôle d'appartenance : `publication.auteur.toString() !== req.utilisateurId` donne 403. `toString()` transforme l'ObjectId de MongoDB en texte, pour comparer un texte avec l'id du jeton qui est aussi un texte.
+- Modification : seul `contenu` est pris dans le corps. `save()` enregistre et relance la validation du schéma.
+- Suppression : `publication.deleteOne()`.
+- Tests avec `curl` et un deuxième compte de test (`bob_essai`) : Bob modifie ou supprime la publication de Sicilia (403), Sicilia modifie la sienne (200), contenu vide (400), Sicilia supprime une publication (200), relecture de la publication supprimée (404).
+
+**Choix techniques et justifications**
+- 403 et non 401 : Bob est bien identifié, mais il n'a pas le droit.
+- Authentification et autorisation sont deux contrôles différents. Authentification : qui es-tu ? C'est le middleware, qui répond 401. Autorisation : as-tu le droit ? C'est la route, qui répond 403.
+- Le contrôle d'appartenance protège contre BOLA (n°1 du OWASP API Top 10) : être connecté ne suffit pas pour toucher aux contenus des autres.
+
+**Questions de jury, partie 5b (2026-11-17)**
+- Différence entre 401 et 403 ? 401 : le serveur ne sait pas qui on est (identifiants faux, pas de jeton, jeton invalide). 403 : il sait qui on est, mais on n'a pas le droit.
+- Pourquoi Bob, connecté, ne peut pas modifier la publication de Sicilia ? Son jeton est valide, donc le middleware le laisse passer. Mais la route compare l'auteur de la publication avec l'id du jeton. Ce n'est pas le même, donc 403.
+- Points à retravailler : la différence entre le rôle du middleware (authentification) et celui de la route (autorisation). Ne pas confondre l'empreinte (mot de passe haché, connexion) et le jeton.
+
 **Reprise de la prochaine séance**
-- Partie 5b : modifier et supprimer une publication, seulement si on en est l'auteur (protection BOLA).
+- Partie 5c : les commentaires.

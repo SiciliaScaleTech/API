@@ -69,5 +69,64 @@ router.get('/:id', verifierJeton, async (req, res) => {
   }
 });
 
+// PUT /api/publications/:id : modifier le contenu, seulement par son auteur
+router.put('/:id', verifierJeton, async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(404).json({ message: 'Publication introuvable' });
+    }
+
+    const publication = await Publication.findById(req.params.id);
+    if (!publication) {
+      return res.status(404).json({ message: 'Publication introuvable' });
+    }
+
+    // Contrôle d'appartenance : l'auteur doit être la personne du jeton (protection BOLA)
+    if (publication.auteur.toString() !== req.utilisateurId) {
+      return res.status(403).json({ message: 'Vous ne pouvez modifier que vos propres publications' });
+    }
+
+    // On ne modifie que le contenu. save() relance la validation du schéma
+    const { contenu } = req.body || {};
+    publication.contenu = contenu;
+    await publication.save();
+
+    res.json(publication);
+  } catch (erreur) {
+    // Contenu vide ou trop long : refusé par le schéma
+    if (erreur.name === 'ValidationError') {
+      const messages = Object.values(erreur.errors).map((e) => e.message);
+      return res.status(400).json({ message: 'Données invalides', erreurs: messages });
+    }
+    console.error(erreur);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
+
+// DELETE /api/publications/:id : supprimer, seulement par son auteur
+router.delete('/:id', verifierJeton, async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(404).json({ message: 'Publication introuvable' });
+    }
+
+    const publication = await Publication.findById(req.params.id);
+    if (!publication) {
+      return res.status(404).json({ message: 'Publication introuvable' });
+    }
+
+    // Contrôle d'appartenance, comme pour la modification
+    if (publication.auteur.toString() !== req.utilisateurId) {
+      return res.status(403).json({ message: 'Vous ne pouvez supprimer que vos propres publications' });
+    }
+
+    await publication.deleteOne();
+    res.json({ message: 'Publication supprimée' });
+  } catch (erreur) {
+    console.error(erreur);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
+
 // 3. L'export : on donne le routeur à app.js, qui le branchera sur /api/publications
 module.exports = router;
