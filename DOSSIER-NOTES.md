@@ -333,5 +333,25 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 - Pourquoi Bob, connecté, ne peut pas modifier la publication de Sicilia ? Son jeton est valide, donc le middleware le laisse passer. Mais la route compare l'auteur de la publication avec l'id du jeton. Ce n'est pas le même, donc 403.
 - Points à retravailler : la différence entre le rôle du middleware (authentification) et celui de la route (autorisation). Ne pas confondre l'empreinte (mot de passe haché, connexion) et le jeton.
 
+**Partie 5c : les commentaires (terminée)**
+- Routes emboîtées dans celles des publications, dans `src/routes/publications.js` :
+  - `POST /api/publications/:id/commentaires` : commenter (201, 400 si vide, 404 si la publication n'existe pas)
+  - `GET /api/publications/:id/commentaires` : lire, du plus ancien au plus récent (`sort({ createdAt: 1 })`), 50 au maximum, avec le pseudo des auteurs
+  - `DELETE /api/publications/:id/commentaires/:commentaireId` : supprimer, seulement par l'auteur du commentaire (403 sinon)
+- Un commentaire a trois sources : le contenu vient du corps de la requête, la publication vient de l'adresse (on vérifie qu'elle existe), l'auteur vient du jeton.
+- `findOne({ _id: commentaireId, publication: id })` : le commentaire doit exister et appartenir à la publication indiquée dans l'adresse.
+- Suppression en cascade : la suppression d'une publication supprime aussi ses commentaires (`Commentaire.deleteMany`).
+- Tests avec `curl` et les deux comptes : 8 cas réussis, dont Sicilia qui essaie de supprimer le commentaire de Bob (403) et 0 commentaire orphelin après suppression d'une publication.
+
+**Choix techniques et justifications**
+- Adresses emboîtées : l'adresse montre que le commentaire appartient à une publication.
+- Seul l'auteur d'un commentaire peut le supprimer, même la propriétaire de la publication ne le peut pas.
+- Suppression en cascade : pas de données orphelines dans la base.
+
+**Questions de jury, partie 5c (2026-11-17)**
+- D'où viennent les données d'un commentaire ? Le contenu du corps de la requête, la publication de l'adresse, l'auteur du jeton.
+- Pourquoi supprimer les commentaires avec la publication ? Sinon ils restent orphelins dans la base.
+- Point à retravailler : l'auteur d'un commentaire est la personne du jeton, pas l'auteur de la publication.
+
 **Reprise de la prochaine séance**
-- Partie 5c : les commentaires.
+- Partie 5d : les likes.

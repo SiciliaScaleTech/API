@@ -2,6 +2,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const Publication = require('../models/Publication');
+const Commentaire = require('../models/Commentaire');
 const verifierJeton = require('../middlewares/verifierJeton');
 
 // 2. Le routeur : le groupe des routes des publications
@@ -120,8 +121,94 @@ router.delete('/:id', verifierJeton, async (req, res) => {
       return res.status(403).json({ message: 'Vous ne pouvez supprimer que vos propres publications' });
     }
 
+    // On supprime aussi ses commentaires, pour ne pas laisser de commentaires orphelins
+    await Commentaire.deleteMany({ publication: publication._id });
     await publication.deleteOne();
     res.json({ message: 'Publication supprimée' });
+  } catch (erreur) {
+    console.error(erreur);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
+
+// POST /api/publications/:id/commentaires : commenter une publication
+router.post('/:id/commentaires', verifierJeton, async (req, res) => {
+  try {
+    // On vérifie d'abord que la publication à commenter existe
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(404).json({ message: 'Publication introuvable' });
+    }
+    const publication = await Publication.findById(req.params.id);
+    if (!publication) {
+      return res.status(404).json({ message: 'Publication introuvable' });
+    }
+
+    // Seul le contenu vient du client. La publication vient de l'adresse, l'auteur du jeton
+    const { contenu } = req.body || {};
+    const commentaire = await Commentaire.create({
+      contenu,
+      publication: publication._id,
+      auteur: req.utilisateurId,
+    });
+
+    res.status(201).json(commentaire);
+  } catch (erreur) {
+    // Contenu vide ou trop long : refusé par le schéma
+    if (erreur.name === 'ValidationError') {
+      const messages = Object.values(erreur.errors).map((e) => e.message);
+      return res.status(400).json({ message: 'Données invalides', erreurs: messages });
+    }
+    console.error(erreur);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
+
+// GET /api/publications/:id/commentaires : les commentaires d'une publication, du plus ancien au plus récent
+router.get('/:id/commentaires', verifierJeton, async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(404).json({ message: 'Publication introuvable' });
+    }
+    const publication = await Publication.findById(req.params.id);
+    if (!publication) {
+      return res.status(404).json({ message: 'Publication introuvable' });
+    }
+
+    const commentaires = await Commentaire.find({ publication: publication._id })
+      .sort({ createdAt: 1 }) // 1 = ordre croissant : on lit la conversation dans l'ordre
+      .limit(50) // jamais plus de 50 à la fois
+      .populate('auteur', 'pseudo');
+
+    res.json(commentaires);
+  } catch (erreur) {
+    console.error(erreur);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
+
+// DELETE /api/publications/:id/commentaires/:commentaireId : supprimer un commentaire, seulement par son auteur
+router.delete('/:id/commentaires/:commentaireId', verifierJeton, async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id) || !mongoose.isValidObjectId(req.params.commentaireId)) {
+      return res.status(404).json({ message: 'Commentaire introuvable' });
+    }
+
+    // Le commentaire doit exister ET appartenir à la publication indiquée dans l'adresse
+    const commentaire = await Commentaire.findOne({
+      _id: req.params.commentaireId,
+      publication: req.params.id,
+    });
+    if (!commentaire) {
+      return res.status(404).json({ message: 'Commentaire introuvable' });
+    }
+
+    // Contrôle d'appartenance, comme pour les publications
+    if (commentaire.auteur.toString() !== req.utilisateurId) {
+      return res.status(403).json({ message: 'Vous ne pouvez supprimer que vos propres commentaires' });
+    }
+
+    await commentaire.deleteOne();
+    res.json({ message: 'Commentaire supprimé' });
   } catch (erreur) {
     console.error(erreur);
     res.status(500).json({ message: 'Erreur serveur' });
