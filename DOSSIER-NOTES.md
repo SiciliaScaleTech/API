@@ -241,5 +241,28 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 - Pourquoi 400 ou 409 et pas 500 ? Ce n'est pas un bug du serveur mais une demande du client qui pose problème. Un code 4xx permet au front-end d'afficher un message utile, et on garde 500 pour les vrais bugs.
 - Point à retravailler : les familles de codes HTTP, découvertes pendant cette séance.
 
+**Partie 3 : route de connexion avec JWT (terminée)**
+- Installation de `jsonwebtoken` (`npm install jsonwebtoken`) : bibliothèque de référence pour fabriquer (`jwt.sign`) et vérifier (`jwt.verify`) des JWT. On n'écrit pas soi-même un mécanisme de signature.
+- Clé `JWT_SECRET` : la valeur d'exemple a été remplacée par 128 caractères aléatoires, générés avec le module `crypto` de Node et écrits directement dans `.env` sans être affichés. `.env` est ignoré par Git.
+- Route `POST /api/auth/connexion`, 4 contrôles dans l'ordre :
+  1. `email` et `motDePasse` doivent être des textes, sinon 400.
+  2. Recherche du compte par email avec `select('+motDePasse')`, sinon 401.
+  3. `bcrypt.compare` du mot de passe tapé avec l'empreinte, sinon 401.
+  4. Fabrication du jeton avec `jwt.sign({ id }, JWT_SECRET, { expiresIn: '1h' })`, réponse 200.
+- Tests avec `curl` : bon mot de passe 200 avec un jeton, mauvais mot de passe 401, email inconnu 401, email envoyé sous forme d'objet 400.
+- Décodage du milieu d'un jeton sans la clé : `{"id":"...","iat":...,"exp":...}`. Preuve que le contenu est lisible par tous.
+
+**Choix techniques et justifications**
+- Vérifier que les champs sont des textes (`typeof`) : bloque l'injection NoSQL. Sans ce contrôle, un email envoyé sous la forme `{"$ne": null}` ferait trouver n'importe quel compte.
+- Même code (401) et même message pour « email inconnu » et « mauvais mot de passe » : un pirate ne peut pas savoir quels emails sont inscrits (énumération de comptes).
+- Le jeton ne contient que l'`id` : son contenu n'est pas chiffré, seulement signé.
+- Expiration à 1 heure : un jeton volé ne sert pas longtemps.
+- Incident pendant la séance : un copier-coller a supprimé la vérification du mot de passe sans provoquer d'erreur de Node. N'importe qui pouvait alors se connecter avec un email connu. Repéré en relisant le code et corrigé. Leçon : toujours relire et toujours tester les cas d'échec, pas seulement le cas qui marche.
+
+**Questions de jury, partie 3 (2026-11-16)**
+- Un JWT est-il chiffré ? Non, il est seulement signé. Son contenu est lisible par tous, donc jamais de mot de passe dedans. On y met l'id, et la bibliothèque ajoute la date de création (`iat`) et d'expiration (`exp`).
+- À quoi sert `JWT_SECRET` ? À signer les jetons et à vérifier leur signature. Si un pirate la découvre, il peut fabriquer de faux jetons au nom de n'importe quel utilisateur. D'où une clé longue, aléatoire, dans `.env`, jamais sur Git.
+- Point à retravailler : le rôle de la clé secrète, non retrouvé seule.
+
 **Reprise de la prochaine séance**
-- Partie 3 : route de connexion avec JWT.
+- Partie 4 : middleware d'authentification (vérifier le jeton avec `jwt.verify` avant les routes protégées).

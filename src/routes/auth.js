@@ -1,5 +1,9 @@
 const express = require('express');
 const Utilisateur = require('../models/Utilisateur');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+
 
 // Un routeur : un petit groupe de routes qu'on branchera ensuite dans app.js
 const router = express.Router();
@@ -32,6 +36,45 @@ router.post('/inscription', async (req, res) => {
       return res.status(409).json({ message: 'Ce pseudo ou cet email est déjà utilisé' });
     }
     // Toute autre erreur : on garde le détail pour nous, le client reçoit un message vague
+    console.error(erreur);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
+
+// POST /api/auth/connexion : vérifier l'email et le mot de passe
+router.post('/connexion', async (req, res) => {
+  try {
+    const { email, motDePasse } = req.body || {};
+
+    // 1. Les deux champs doivent être des textes (bloque aussi les champs manquants)
+    if (typeof email !== 'string' || typeof motDePasse !== 'string') {
+      return res.status(400).json({ message: 'Email et mot de passe obligatoires' });
+    }
+
+    // Même message pour tous les échecs : on ne révèle pas si l'email existe
+    const messageEchec = 'Email ou mot de passe incorrect';
+
+    // 2. Chercher le compte par son email, en demandant le mot de passe caché
+    const utilisateur = await Utilisateur.findOne({ email }).select('+motDePasse');
+    if (!utilisateur) {
+      return res.status(401).json({ message: messageEchec });
+    }
+
+    // 3. Comparer le mot de passe tapé avec l'empreinte stockée
+    const motDePasseCorrect = await bcrypt.compare(motDePasse, utilisateur.motDePasse);
+    if (!motDePasseCorrect) {
+      return res.status(401).json({ message: messageEchec });
+    }
+
+    // 4. Fabriquer le jeton : il contient l'id du compte, signé avec la clé secrète
+    const jeton = jwt.sign(
+      { id: utilisateur._id },     // contenu du jeton (lisible par tous, rien de secret)
+      process.env.JWT_SECRET,      // clé secrète, lue dans le fichier .env
+      { expiresIn: '1h' }          // le jeton ne sera plus valable après 1 heure
+    );
+
+    res.json({ jeton });
+  } catch (erreur) {
     console.error(erreur);
     res.status(500).json({ message: 'Erreur serveur' });
   }
