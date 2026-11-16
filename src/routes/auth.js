@@ -103,6 +103,7 @@ router.get('/moi', verifierJeton, async (req, res) => {
       pseudo: utilisateur.pseudo,
       email: utilisateur.email,
       bio: utilisateur.bio,
+      abonnements: utilisateur.abonnements, // les id des membres suivis, utiles au front-end
     });
   } catch (erreur) {
     console.error(erreur);
