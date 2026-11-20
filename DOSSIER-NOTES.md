@@ -571,6 +571,12 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 - Cacher « Modifier » et « Supprimer » suffit-il ? Non. Un pirate peut envoyer la requête DELETE avec curl. La protection est dans l'API, qui répond 403 si l'auteur n'est pas la personne du jeton. Formule à retenir : le front aide l'utilisateur, le back protège les données.
 - Point à retravailler : Sicilia pensait que cacher les boutons suffisait.
 
+**Charte graphique (2026-11-20)**
+- Palette violet et corail choisie par Sicilia : violet `#5b3fd9` pour l'en-tête (en dégradé) et les boutons, corail `#c42f3c` pour les likes, fond lavande très clair `#f5f3ff`.
+- Cartes et boutons arrondis, ombre légère sur les cartes.
+- Toutes les couleurs sont des variables CSS dans `:root` : changer l'ambiance revient à modifier quelques lignes.
+- Accessibilité : chaque couple texte et fond a été vérifié avec la formule de contraste de la norme WCAG. Minimum 4,5 pour 1. Le corail de départ (4,2 pour 1) a été foncé pour atteindre 5 pour 1.
+
 **Bilan de l'étape 8**
 - Parcours complet réalisé depuis le navigateur : inscription, connexion, publication, like, commentaire, modification, suppression, abonnement, fil, déconnexion.
 
