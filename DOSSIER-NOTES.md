@@ -580,5 +580,37 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 **Bilan de l'étape 8**
 - Parcours complet réalisé depuis le navigateur : inscription, connexion, publication, like, commentaire, modification, suppression, abonnement, fil, déconnexion.
 
+### Étape 9 - Docker (en cours)
+
+**Notions**
+- Dockerfile : la recette. Image : le résultat de la recette, figé (le plat surgelé). Conteneur : une image en train de tourner (le plat servi), jetable.
+- Volume : stockage à côté du conteneur, qui survit à sa suppression.
+- Docker Compose : décrit plusieurs conteneurs, leur réseau, leurs volumes et leurs ports. Une commande lance tout.
+- Différence avec une VM : une VM simule un ordinateur entier avec son système. Un conteneur partage le système de la machine, il est léger et démarre en une seconde.
+- Redirection de port de VS Code : le serveur tourne dans la VM, VS Code ouvre le même port sur l'ordinateur et fait passer les échanges dans le tunnel SSH chiffré. La VM est en mode NAT dans VirtualBox : elle n'est pas joignable depuis le réseau, sauf ports ouverts explicitement.
+
+**Partie 9a : Dockerfile et .dockerignore (terminée)**
+- `Dockerfile` : image officielle `node:26-slim`, dossier `/app`, `NODE_ENV=production`, installation des dépendances avec `npm ci --omit=dev` (versions exactes du `package-lock.json`, sans outils de développement), copie de `src` et `public`, utilisateur limité `node` au lieu de root, commande `node src/server.js`.
+- Ordre des étapes : `package.json` est copié et installé avant le code, pour que Docker réutilise ce cache tant que les dépendances ne changent pas.
+- `.dockerignore` : `.env`, `.env.mongo`, `node_modules`, `.git`, la documentation et les notes ne sont jamais copiés dans l'image.
+- Test : `sudo docker build -t reseau-api .` réussi. `sudo docker run --rm reseau-api ls -a /app` montre seulement `node_modules`, `package.json`, `package-lock.json`, `public` et `src`. Aucun secret dans l'image.
+- Question de jury : pourquoi `.env` ne doit jamais être dans l'image ? Il contient les mots de passe et la clé des jetons. Une image peut être partagée ou publiée. Les secrets sont donnés au conteneur seulement au démarrage. Réponse donnée seule.
+
+**Partie 9b : Docker Compose (terminée)**
+- `MONGO_URI` découpée en 4 variables dans `.env` : `MONGO_UTILISATEUR`, `MONGO_MOT_DE_PASSE`, `MONGO_HOTE`, `MONGO_BASE`. `src/config/db.js` reconstruit l'adresse (avec `encodeURIComponent` pour les caractères spéciaux). Docker n'a plus qu'à changer l'hôte. Modification de `.env` faite par un script, sans afficher le mot de passe. `.env.example` mis à jour.
+- `docker-compose.yml`, deux services :
+  - `mongo` : image `mongo:9.0`, volume `donnees-mongo`, script `docker/mongo-init.js` qui crée le compte `reseau_api` (rôle `readWrite` sur sa base) au premier démarrage, vérification de santé toutes les 10 secondes. Aucun port publié. Il ne reçoit que les variables dont il a besoin, pas `JWT_SECRET`.
+  - `api` : construite avec le Dockerfile, secrets donnés par `env_file: .env`, `MONGO_HOTE: mongo`, seul port publié `127.0.0.1:3000`, démarrage seulement quand MongoDB est prête (`condition: service_healthy`).
+- Les deux conteneurs se parlent sur un réseau privé créé par Compose. L'API joint la base par le nom du service, `mongo`.
+
+**Partie 9c : lancement depuis zéro (presque terminée)**
+- `sudo docker compose up -d --build` puis `sudo docker compose ps` : `api` et `mongo` en marche, `mongo` en bonne santé, port 27017 interne seulement.
+- Test avec `curl` sur la version Docker : inscription (201), connexion, publication (201), fil. L'ancien compte `sicilia` est inconnu : la base est bien neuve, créée depuis zéro, avec le compte de l'API créé automatiquement.
+
+**Difficultés rencontrées et solutions**
+- `failed to bind host port 127.0.0.1:3000/tcp: address already in use` : le serveur `npm run dev` occupait encore le port 3000. Un seul programme à la fois peut écouter sur un port. Leçon : lancer soit `npm run dev`, soit Docker Compose, jamais les deux.
+- Après avoir libéré le port, le conteneur `api` tournait mais sans port publié, car il avait été créé pendant l'échec. Solution : `sudo docker compose up -d --force-recreate api`.
+
 **Reprise de la prochaine séance**
-- Étape 9 : Docker (Dockerfile et docker-compose).
+- Test de persistance : `sudo docker compose up -d`, puis se connecter avec `docker@exemple.fr` / `MotDePasseDocker1` et vérifier que la publication « Premier message depuis Docker ! » est toujours là après le `down`.
+- Puis questions de jury de l'étape 9, et étape 10 : documentation (README et routes).
