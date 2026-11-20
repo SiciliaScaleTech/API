@@ -1,0 +1,16 @@
+# Fichiers que Docker ne doit JAMAIS copier dans l'image
+
+# Secrets : une image peut être partagée, les secrets ne doivent pas s'y trouver
+.env
+.env.mongo
+
+# Les dépendances sont réinstallées proprement dans l'image (npm ci)
+node_modules
+
+# Historique Git, documentation et notes : inutiles pour faire tourner l'API
+.git
+docs
+scripts
+DOSSIER-NOTES.md
+PARCOURS.md
+CLAUDE.md
