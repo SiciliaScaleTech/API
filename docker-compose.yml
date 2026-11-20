@@ -1,0 +1,48 @@
+# Lance tout le projet (API + MongoDB) avec une seule commande :
+#   sudo docker compose up -d --build
+# Prérequis : les fichiers .env et .env.mongo remplis (voir .env.example)
+#
+# Les valeurs écrites ${COMME_CECI} sont lues dans le fichier .env
+
+services:
+  # ---------- La base de données ----------
+  mongo:
+    image: mongo:9.0 # version fixée, pas "latest"
+    restart: unless-stopped # redémarre tout seul, sauf si on l'arrête nous-mêmes
+    env_file: .env.mongo # compte administrateur de MongoDB, utilisé seulement au premier démarrage
+    environment:
+      # Pour le script d'initialisation : le compte de l'API à créer.
+      # On ne donne pas tout .env à MongoDB : JWT_SECRET ne le concerne pas (moindre privilège)
+      MONGO_UTILISATEUR: ${MONGO_UTILISATEUR}
+      MONGO_MOT_DE_PASSE: ${MONGO_MOT_DE_PASSE}
+      MONGO_BASE: ${MONGO_BASE}
+    volumes:
+      # Volume : les données survivent si le conteneur est supprimé ou recréé
+      - donnees-mongo:/data/db
+      # Script exécuté au premier démarrage, en lecture seule (ro)
+      - ./docker/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    # PAS de "ports" : la base n'est joignable que par l'API, sur le réseau privé de Compose
+    healthcheck:
+      # Vérifie toutes les 10 secondes que MongoDB répond
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # ---------- L'API (et le front-end) ----------
+  api:
+    build: . # l'image est fabriquée avec le Dockerfile de ce dossier
+    restart: unless-stopped
+    env_file: .env # JWT_SECRET, compte MongoDB de l'API, CORS...
+    environment:
+      MONGO_HOTE: mongo # dans Docker, MongoDB s'appelle par son nom de service
+    ports:
+      # Seul port ouvert : 3000, et seulement sur la machine elle-même (127.0.0.1)
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      mongo:
+        condition: service_healthy # l'API attend que MongoDB soit prête avant de démarrer
+
+volumes:
+  donnees-mongo:
