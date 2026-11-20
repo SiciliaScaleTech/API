@@ -6,16 +6,24 @@
 
 /* Variables : les couleurs sont définies une seule fois */
 :root {
-  --fond: #f4f4f4;
+  /* Palette violet et corail. Les contrastes texte et fond respectent
+     le minimum recommandé pour l'accessibilité (4,5 pour 1, norme WCAG) */
+  --fond: #f5f3ff; /* lavande très clair */
   --carte: #ffffff;
-  --texte: #222222;
-  --texte-doux: #666666;
-  --principal: #333333;
-  --lien: #223355;
-  --danger: #a33333;
-  --fond-erreur: #fde8e8;
-  --fond-succes: #e6f4ea;
-  --bordure: #cccccc;
+  --texte: #1f1a33;
+  --texte-doux: #5f5a73;
+  --principal: #5b3fd9; /* violet : en-tête, boutons */
+  --principal-fonce: #4527b8; /* violet foncé : survol des boutons */
+  --principal-clair: #ece8ff; /* violet très clair : onglets, avatars */
+  --accent: #c42f3c; /* corail : likes */
+  --accent-clair: #fff0f1;
+  --lien: #4c2fc4;
+  --danger: #b4232f;
+  --fond-erreur: #fdecee;
+  --fond-succes: #e6f6ec;
+  --bordure: #e2dcff;
+  --champ: #b9b0dc; /* bordure des champs de saisie */
+  --arrondi: 10px; /* coins arrondis des cartes et des boutons */
 }
 
 /* Base */
@@ -59,7 +67,7 @@ h2 {
 
 /* Contour bien visible quand on navigue au clavier (accessibilité) */
 :focus-visible {
-  outline: 3px solid #4a7bd0;
+  outline: 3px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -71,6 +79,7 @@ h2 {
   background: var(--principal);
   color: #ffffff;
   font-size: 1rem;
+  border-radius: var(--arrondi);
   cursor: pointer;
 }
 
@@ -80,12 +89,13 @@ h2 {
 }
 
 .bouton:hover {
-  background: #000000;
+  background: var(--principal-fonce);
 }
 
 .bouton-contour {
   padding: 6px 12px;
   border: 1px solid #ffffff;
+  border-radius: var(--arrondi);
   background: transparent;
   color: #ffffff;
   cursor: pointer;
@@ -108,14 +118,16 @@ h2 {
 
 .bouton-like {
   padding: 4px 10px;
-  border: 1px solid #999999;
+  border: 1px solid var(--champ);
+  border-radius: 999px; /* bouton en forme de pilule */
   background: #ffffff;
   cursor: pointer;
 }
 
 .bouton-like.aime {
-  border-color: var(--danger);
-  color: var(--danger);
+  border-color: var(--accent);
+  background: var(--accent-clair);
+  color: var(--accent);
 }
 
 /* ---------- Messages ---------- */
@@ -124,7 +136,8 @@ h2 {
   margin: 12px 0;
   background: var(--fond-erreur);
   color: var(--danger);
-  border: 1px solid #e0a0a0;
+  border: 1px solid #f0b4bb;
+  border-radius: var(--arrondi);
 }
 
 .message.succes {
@@ -144,7 +157,7 @@ h2 {
   padding: 12px;
   border: none;
   border-bottom: 4px solid transparent;
-  background: #e8e8e8;
+  background: var(--principal-clair);
   color: var(--texte-doux);
   font-size: 1rem;
   cursor: pointer;
@@ -168,6 +181,7 @@ h2 {
   text-align: center;
   font-size: 2rem;
   margin: 0;
+  color: var(--principal);
 }
 
 .sous-titre {
@@ -189,7 +203,8 @@ h2 {
 .formulaire input {
   padding: 12px;
   font-size: 1rem;
-  border: 1px solid #999999;
+  border: 1px solid var(--champ);
+  border-radius: 8px;
 }
 
 .formulaire .bouton {
@@ -202,7 +217,8 @@ h2 {
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  background: var(--principal);
+  /* dégradé du violet vers un violet plus lumineux */
+  background: linear-gradient(90deg, var(--principal), #7a4fe0);
 }
 
 .logo {
@@ -233,6 +249,8 @@ h2 {
 .carte {
   background: var(--carte);
   border: 1px solid var(--bordure);
+  border-radius: var(--arrondi);
+  box-shadow: 0 2px 6px rgba(91, 63, 217, 0.08); /* ombre violette très légère */
   padding: 12px;
   margin-bottom: 12px;
 }
@@ -248,7 +266,8 @@ h2 {
   padding: 10px;
   font-size: 1rem;
   font-family: inherit;
-  border: 1px solid #999999;
+  border: 1px solid var(--champ);
+  border-radius: 8px;
   resize: vertical;
 }
 
@@ -277,7 +296,7 @@ h2 {
 
 .date {
   font-size: 0.8rem;
-  color: #999999;
+  color: var(--texte-doux);
 }
 
 .contenu {
@@ -320,7 +339,8 @@ h2 {
   flex: 1;
   min-width: 0;
   padding: 6px;
-  border: 1px solid #999999;
+  border: 1px solid var(--champ);
+  border-radius: 8px;
 }
 
 /* Champ de modification d'une publication */
@@ -330,7 +350,8 @@ h2 {
   padding: 10px;
   font-size: 1rem;
   font-family: inherit;
-  border: 1px solid #999999;
+  border: 1px solid var(--champ);
+  border-radius: 8px;
 }
 
 .modification .publier-bas {
@@ -358,8 +379,9 @@ h2 {
   height: 64px;
   margin: 0 auto;
   border-radius: 50%;
-  background: #dddddd;
-  color: var(--texte-doux);
+  background: var(--principal-clair);
+  color: var(--principal);
+  font-weight: bold;
   font-size: 1.6rem;
   display: flex;
   align-items: center;
