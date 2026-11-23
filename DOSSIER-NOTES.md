@@ -644,5 +644,13 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 - Un README pour l'installation, un document séparé pour les routes et un pour la sécurité : chaque lecteur trouve ce qui le concerne (administrateur, développeur, jury).
 - Les commandes du README ont été testées pour de vrai dans un dossier neuf, pas seulement relues.
 
+**Sauvegarde sur GitHub (2026-11-23)**
+- Jusque-là, le projet n'existait que dans la VM : un commit est une sauvegarde locale, il faut un `git push` vers un dépôt distant pour l'envoyer ailleurs.
+- Vérification préalable : aucun secret n'est jamais entré dans l'historique Git (`.env` et `.env.mongo` sont dans `.gitignore` depuis le début).
+- Dépôt privé `SiciliaScaleTech/API`. Il avait d'abord été créé en public : repéré avant l'envoi (la page répondait 200 sans connexion, au lieu de 404), puis passé en privé.
+- Accès par une clé SSH de déploiement, propre à la VM et limitée à ce seul dépôt, avec droit d'écriture. Moindre privilège : si la VM était compromise, seul ce dépôt serait concerné. La clé avait d'abord été ajoutée au compte entier, puis déplacée dans le dépôt.
+- Pas de jeton GitHub échangé dans la conversation : un jeton est un secret, et il donne souvent accès à tout le compte. Seule la clé publique, qui n'est pas secrète, a été copiée.
+- 38 commits envoyés avec `git push -u origin main`.
+
 **Reprise de la prochaine séance**
 - Envoi du dossier professionnel prévu fin novembre. Ensuite : étape 11 (révision pour l'oral) et étape 12 (anglais technique).
