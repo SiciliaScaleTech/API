@@ -13,7 +13,7 @@ Ce document présente les mesures de sécurité de l'API de réseau social et le
 | API5 : autorisation défaillante au niveau des fonctions | Non | L'API n'a pas de fonctions d'administration. Tous les membres ont les mêmes droits. |
 | API6 : accès sans limite aux processus métier sensibles | En partie | L'inscription est limitée à 10 essais par 15 minutes, contre la création de comptes en masse. |
 | API7 : falsification de requêtes côté serveur (SSRF) | Non | L'API n'appelle aucune adresse fournie par un utilisateur. |
-| API8 : mauvaise configuration de sécurité | Oui | En-têtes de sécurité avec helmet. CORS limité au front-end. Erreurs sans détails techniques. Secrets dans `.env`, ignoré par Git. Le serveur refuse de démarrer sans `JWT_SECRET`. |
+| API8 : mauvaise configuration de sécurité | Oui | En-têtes de sécurité avec helmet. CORS limité au front-end. Erreurs sans détails techniques. Secrets dans `.env`, ignoré par Git et absent de l'image Docker. Le serveur refuse de démarrer sans `JWT_SECRET`. Base de données jamais exposée à l'extérieur. |
 | API9 : mauvaise gestion de l'inventaire | Oui | Toutes les routes sont documentées (étape 10). Une seule version de l'API. |
 | API10 : consommation non sécurisée d'API tierces | Non | L'API n'utilise aucune API externe. |
 
@@ -51,8 +51,18 @@ Ce document présente les mesures de sécurité de l'API de réseau social et le
 - CORS n'autorise qu'une seule origine, celle du front-end, définie dans `.env`. Seulement les méthodes et en-têtes utilisés.
 - Les erreurs renvoyées au client sont courtes et sans détails techniques. Le détail reste dans le terminal du serveur.
 
+### Déploiement avec Docker
+- **Aucun secret dans l'image** : `.env` et `.env.mongo` sont exclus par le fichier `.dockerignore`. Les secrets sont transmis aux conteneurs au démarrage seulement. Une image peut donc être partagée sans risque.
+- **Base de données non exposée** : le service `mongo` n'a aucun port publié. Il n'est joignable que par l'API, sur le réseau privé créé par Docker Compose.
+- **API publiée seulement en local** : le port 3000 n'est ouvert que sur `127.0.0.1`. Une ouverture sur Internet doit passer par un serveur web qui assure le HTTPS.
+- **Conteneur sans droits d'administrateur** : l'API tourne avec l'utilisateur limité `node`, et non `root`.
+- **Moindre privilège pour la base** : l'API utilise un compte dédié, limité à la lecture et à l'écriture sur sa seule base. Le compte administrateur n'est utilisé qu'au premier démarrage. Le conteneur MongoDB ne reçoit pas `JWT_SECRET`.
+- **Versions fixées** : `node:26-slim`, `mongo:9.0` et `package-lock.json`. Une mise à jour n'arrive jamais sans être choisie.
+- **Fichiers secrets protégés** : `chmod 600` sur `.env` et `.env.mongo`, mots de passe générés aléatoirement avec OpenSSL.
+
 ## Risques connus et acceptés
 - **Énumération à l'inscription** : la réponse 409 « Ce pseudo ou cet email est déjà utilisé » révèle qu'un email est inscrit. C'est un compromis courant pour aider l'utilisateur. Le risque est réduit par la limite de 10 essais par 15 minutes.
 - **Révocation des jetons** : un jeton reste valable jusqu'à son expiration, même après une déconnexion. La durée courte (1 heure) limite ce risque.
 - **Compteur de requêtes en mémoire** : il se remet à zéro au redémarrage du serveur. Avec plusieurs serveurs, il faudrait un stockage partagé.
 - **HTTPS** : il sera assuré au déploiement par le serveur placé devant l'API. Sans lui, les jetons circuleraient en clair.
+- **Adresse IP derrière Docker ou un proxy** : avec Docker, l'API peut voir l'adresse du réseau Docker au lieu de celle du visiteur. Tous les visiteurs partageraient alors le même compteur de requêtes. En production, derrière un serveur web, il faudra configurer Express pour lire la vraie adresse (`trust proxy`).
