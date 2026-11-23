@@ -69,10 +69,10 @@ Chaque étape se termine par une validation. On ne passe à la suivante qu'une f
 - Validation : `docker compose up` lance tout depuis zéro (réussie le 2026-11-20, persistance vérifiée le 2026-11-23)
 
 ### Étape 10 - Documentation du déploiement (Bloc 2)
-- [ ] README : prérequis, installation, lancement, arrêt
-- [ ] Documentation des routes de l'API
-- [ ] Document de sécurité : chaque mesure et sa justification
-- Validation : une personne extérieure peut déployer le projet en suivant uniquement le README
+- [x] README : prérequis, installation, lancement, arrêt
+- [x] Documentation des routes de l'API (`docs/api.md`)
+- [x] Document de sécurité : chaque mesure et sa justification (`docs/securite.md`)
+- Validation : une personne extérieure peut déployer le projet en suivant uniquement le README (réussie le 2026-11-23 dans une copie neuve du projet)
 
 ### Étape 11 - Révision pour l'oral
 - [ ] Fiche de révision par étape à partir de DOSSIER-NOTES.md

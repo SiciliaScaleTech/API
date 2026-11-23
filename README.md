@@ -24,6 +24,8 @@ Réseau est un petit réseau social : les membres publient des messages, les com
 
 ## Prérequis
 
+Ce guide s'adresse à une personne à l'aise avec un terminal Linux : se déplacer dans les dossiers, lancer des commandes, utiliser `sudo`.
+
 - **Docker** et **Docker Compose** (version 2, commande `docker compose`)
 - **Git**, pour récupérer le projet
 - **OpenSSL**, pour générer les mots de passe (présent sur la plupart des systèmes Linux et macOS)

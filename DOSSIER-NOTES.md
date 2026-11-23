@@ -625,5 +625,24 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 **Bilan de l'étape 9**
 - `docker compose up` lance tout le projet depuis zéro : API, base, compte de l'API, volume. Base non exposée à l'extérieur, secrets hors de l'image.
 
+### Étape 10 - Documentation du déploiement
+
+**Ce qui a été fait (2026-11-23)**
+- `README.md` : présentation, fonctionnalités, technologies, prérequis, installation, lancement, vérification, arrêt, mise à jour, journaux, dépannage, mode développement, structure du projet, mise en production.
+- Les mots de passe sont générés par des commandes qui écrivent directement dans `.env` et `.env.mongo`, sans les afficher.
+- Le tableau de dépannage reprend les problèmes réellement rencontrés : port déjà utilisé, `localhost` en IPv6, transfert de port de VS Code.
+- `.env.mongo.example` ajouté : il manquait un modèle pour la configuration de MongoDB.
+- `docs/api.md` : les 19 routes, avec leurs données attendues, leurs réponses et leurs codes d'erreur, un tableau des codes HTTP et un exemple complet avec curl.
+- `docs/securite.md` complété : partie « Déploiement avec Docker » (aucun secret dans l'image, base sans port publié, API sur 127.0.0.1, utilisateur `node`, compte de base limité, versions fixées, fichiers en `chmod 600`) et nouveau risque connu (adresse IP des visiteurs derrière Docker ou un proxy).
+
+**Validation : le test de la personne extérieure**
+- Copie neuve du projet avec `git clone` dans `~/test-readme`, puis installation en suivant uniquement les commandes du README. Sicilia a lancé les commandes Docker.
+- Résultat : API en marche (200), base neuve (compte de la version habituelle inconnu, 401), inscription possible (201). Le compte de l'API a été créé automatiquement.
+- Retour du test : Sicilia ne savait pas suivre le README seule. Ajout d'une phrase dans les prérequis : le guide s'adresse à une personne à l'aise avec un terminal Linux.
+
+**Choix techniques et justifications**
+- Un README pour l'installation, un document séparé pour les routes et un pour la sécurité : chaque lecteur trouve ce qui le concerne (administrateur, développeur, jury).
+- Les commandes du README ont été testées pour de vrai dans un dossier neuf, pas seulement relues.
+
 **Reprise de la prochaine séance**
-- Étape 10 : documentation du déploiement (README, documentation des routes). Le document de sécurité existe déjà (`docs/securite.md`).
+- Envoi du dossier professionnel prévu fin novembre. Ensuite : étape 11 (révision pour l'oral) et étape 12 (anglais technique).
