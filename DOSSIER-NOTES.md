@@ -580,7 +580,7 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 **Bilan de l'étape 8**
 - Parcours complet réalisé depuis le navigateur : inscription, connexion, publication, like, commentaire, modification, suppression, abonnement, fil, déconnexion.
 
-### Étape 9 - Docker (en cours)
+### Étape 9 - Docker
 
 **Notions**
 - Dockerfile : la recette. Image : le résultat de la recette, figé (le plat surgelé). Conteneur : une image en train de tourner (le plat servi), jetable.
@@ -603,14 +603,27 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
   - `api` : construite avec le Dockerfile, secrets donnés par `env_file: .env`, `MONGO_HOTE: mongo`, seul port publié `127.0.0.1:3000`, démarrage seulement quand MongoDB est prête (`condition: service_healthy`).
 - Les deux conteneurs se parlent sur un réseau privé créé par Compose. L'API joint la base par le nom du service, `mongo`.
 
-**Partie 9c : lancement depuis zéro (presque terminée)**
+**Partie 9c : lancement depuis zéro (terminée)**
 - `sudo docker compose up -d --build` puis `sudo docker compose ps` : `api` et `mongo` en marche, `mongo` en bonne santé, port 27017 interne seulement.
 - Test avec `curl` sur la version Docker : inscription (201), connexion, publication (201), fil. L'ancien compte `sicilia` est inconnu : la base est bien neuve, créée depuis zéro, avec le compte de l'API créé automatiquement.
+- Test de persistance (2026-11-23) : `sudo docker compose down` (conteneurs supprimés), puis `sudo docker compose up -d`. Connexion depuis le navigateur avec le compte `essai_docker` : la publication « Premier message depuis Docker ! » est toujours là. Le conteneur est jetable, le volume garde les données.
 
 **Difficultés rencontrées et solutions**
 - `failed to bind host port 127.0.0.1:3000/tcp: address already in use` : le serveur `npm run dev` occupait encore le port 3000. Un seul programme à la fois peut écouter sur un port. Leçon : lancer soit `npm run dev`, soit Docker Compose, jamais les deux.
 - Après avoir libéré le port, le conteneur `api` tournait mais sans port publié, car il avait été créé pendant l'échec. Solution : `sudo docker compose up -d --force-recreate api`.
 
+- Le site n'était pas accessible depuis le navigateur avec Docker, alors qu'il répondait dans la VM. Deux causes :
+  - dans la VM, `localhost` correspond à l'adresse IPv6 `::1`, alors que Docker n'écoute que sur `127.0.0.1` (IPv4). Même piège qu'à l'étape 2 avec MongoDB.
+  - sur Windows, le port 3000 était déjà occupé, probablement par une règle de redirection de port de VirtualBox, qui envoie vers l'adresse réseau de la VM (`10.0.2.15`), où Docker n'écoute pas, volontairement. Le navigateur affichait `ERR_EMPTY_RESPONSE`.
+  - Solution : VS Code transfère le port vers `127.0.0.1:3001` sur Windows. Le site s'ouvre avec `localhost:3001`.
+
+**Questions de jury, étape 9 (2026-11-23)**
+- Différence entre image et conteneur ? L'image est un modèle figé, fabriqué à partir du Dockerfile, avec l'application et ses dépendances (le moule). Le conteneur est une image en train de tourner, qu'on peut supprimer et recréer (le gâteau).
+- Pourquoi `mongo` n'a pas de `ports` ? Seule l'API parle à la base, par le réseau privé de Compose. Sans port publié, personne ne peut l'attaquer directement de l'extérieur. Moindre privilège appliqué au réseau (image : la réserve d'un restaurant, où les clients n'entrent pas).
+- Points à retravailler : les deux questions n'ont pas été trouvées seules.
+
+**Bilan de l'étape 9**
+- `docker compose up` lance tout le projet depuis zéro : API, base, compte de l'API, volume. Base non exposée à l'extérieur, secrets hors de l'image.
+
 **Reprise de la prochaine séance**
-- Test de persistance : `sudo docker compose up -d`, puis se connecter avec `docker@exemple.fr` / `MotDePasseDocker1` et vérifier que la publication « Premier message depuis Docker ! » est toujours là après le `down`.
-- Puis questions de jury de l'étape 9, et étape 10 : documentation (README et routes).
+- Étape 10 : documentation du déploiement (README, documentation des routes). Le document de sécurité existe déjà (`docs/securite.md`).

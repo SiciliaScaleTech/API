@@ -63,10 +63,10 @@ Chaque étape se termine par une validation. On ne passe à la suivante qu'une f
 - Validation : parcours complet inscription, connexion, publication, depuis le navigateur (réussie le 2026-11-18)
 
 ### Étape 9 - Docker (Bloc 2, documentation du déploiement)
-- [ ] Dockerfile de l'API
-- [ ] docker-compose.yml : API + MongoDB
-- [ ] Variables d'environnement, volume pour les données, base non exposée à l'extérieur
-- Validation : `docker compose up` lance tout depuis zéro
+- [x] Dockerfile de l'API
+- [x] docker-compose.yml : API + MongoDB
+- [x] Variables d'environnement, volume pour les données, base non exposée à l'extérieur
+- Validation : `docker compose up` lance tout depuis zéro (réussie le 2026-11-20, persistance vérifiée le 2026-11-23)
 
 ### Étape 10 - Documentation du déploiement (Bloc 2)
 - [ ] README : prérequis, installation, lancement, arrêt
