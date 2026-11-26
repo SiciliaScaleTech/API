@@ -179,6 +179,33 @@ reseau-social-api/
 - [Documentation des routes de l'API](docs/api.md)
 - [Sécurité du projet](docs/securite.md)
 
+## Déploiement en ligne (Render et MongoDB Atlas)
+
+Le projet est déployé gratuitement : l'API et l'interface sur **Render**, la base sur **MongoDB Atlas**.
+
+### MongoDB Atlas
+1. Créer un cluster gratuit (M0), en Europe.
+2. Créer un utilisateur de base de données dédié à l'API, avec seulement le droit `readWrite` sur la base `reseau_social` (privilège spécifique), et un mot de passe généré automatiquement.
+3. Dans la liste d'accès IP, autoriser `0.0.0.0/0` : l'offre gratuite de Render n'a pas d'adresse IP fixe.
+4. Récupérer l'adresse de connexion (« Connect », puis « Drivers »), y mettre le mot de passe, et **ajouter le nom de la base** avant le `?` :
+   `mongodb+srv://utilisateur:mot-de-passe@cluster.xxxxx.mongodb.net/reseau_social?retryWrites=true&w=majority`
+   Sans le nom de la base, MongoDB utilise la base `test`, où l'utilisateur n'a aucun droit (erreur `user is not allowed to do action [find] on [test.utilisateurs]`).
+
+### Render
+1. Créer un « Web Service » relié au dépôt GitHub, avec le langage **Docker** : Render construit l'image avec le `Dockerfile`.
+2. Variables d'environnement :
+
+| Variable | Valeur |
+|---|---|
+| `MONGO_URI` | l'adresse de connexion d'Atlas |
+| `JWT_SECRET` | une valeur aléatoire (bouton « Generate » de Render) |
+| `TRUST_PROXY` | `1`, pour lire la vraie adresse IP des visiteurs derrière le proxy de Render |
+
+3. Health Check Path : `/api/health`.
+4. Chaque `git push` sur la branche `main` redéploie automatiquement le site.
+
+Render fournit le HTTPS et redirige automatiquement `http://` vers `https://`. Avec l'offre gratuite, le service se met en veille après 15 minutes sans visite : la visite suivante met environ 50 secondes à répondre.
+
 ## Mise en production
 
 En l'état, l'API n'écoute que sur la machine elle-même (`127.0.0.1`). Pour l'ouvrir sur Internet, il faut placer devant elle un serveur web (par exemple Nginx ou Caddy) qui assure le **HTTPS**. Sans HTTPS, les mots de passe et les jetons circuleraient en clair. Il faut alors aussi mettre à jour `CORS_ORIGINE` avec l'adresse publique du site.

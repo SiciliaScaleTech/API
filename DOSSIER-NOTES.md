@@ -654,3 +654,29 @@ Chaque exemple suit les 5 rubriques du modèle officiel. Les notes sont donc cla
 
 **Reprise de la prochaine séance**
 - Envoi du dossier professionnel prévu fin novembre. Ensuite : étape 11 (révision pour l'oral) et étape 12 (anglais technique).
+
+### Déploiement en ligne : Render et MongoDB Atlas (2026-11-26)
+
+**Ce qui a été fait**
+- Adresse du site : https://reseau-social-8eyg.onrender.com (API et interface sur Render, base sur MongoDB Atlas, offres gratuites).
+- Code adapté, sans rien changer pour la VM et Docker :
+  - variable facultative `MONGO_URI` : si elle existe, l'adresse d'Atlas (`mongodb+srv://...`) est utilisée telle quelle, sinon l'adresse est reconstruite à partir des 4 variables
+  - variable facultative `TRUST_PROXY` : derrière le proxy de Render, Express lit la vraie adresse IP du visiteur. Sans ce réglage, tous les visiteurs partageraient le même compteur de la limitation des requêtes.
+- Atlas : cluster gratuit en Europe, utilisateur `reseau_api` avec seulement `readWrite` sur `reseau_social`, limité au cluster, mot de passe généré automatiquement. Accès réseau `0.0.0.0/0`, car Render gratuit n'a pas d'adresse IP fixe.
+- Render : service Docker relié au dépôt GitHub (accès limité à ce seul dépôt), région Frankfurt, variables `MONGO_URI`, `JWT_SECRET` (générée par Render, différente de celle de la VM) et `TRUST_PROXY=1`, contrôle de santé sur `/api/health`.
+- Tests sur la version en ligne : santé (200), page d'accueil (200), HTTPS avec redirection de `http://` (301), en-têtes de helmet présents, connexion avec un compte inexistant (401), données invalides (400), sans jeton (401), aucun en-tête CORS pour un site tiers.
+
+**Difficultés rencontrées et solutions**
+- La traduction automatique du navigateur modifiait l'affichage d'Atlas : `reseau_api` apparaissait comme « API réseau ». Faillit conduire à supprimer le bon utilisateur. Solution : désactiver la traduction sur ce site, et lire le nom dans la fenêtre de confirmation.
+- Erreur 500 à la connexion. Les journaux de Render montraient `user is not allowed to do action [find] on [test.utilisateurs]`. L'adresse d'Atlas ne contenait pas le nom de la base, donc MongoDB utilisait `test`, où `reseau_api` n'a aucun droit. Le moindre privilège a bloqué l'accès comme prévu. Solution : ajouter `/reseau_social` dans l'adresse. Le visiteur, lui, n'a reçu que « Erreur serveur ».
+
+**Choix techniques et justifications**
+- Secrets saisis directement dans Render, jamais dans le code ni dans la conversation.
+- Une clé `JWT_SECRET` différente pour chaque environnement.
+- Le compte administrateur créé automatiquement par Atlas a été conservé par choix de Sicilia. L'API ne l'utilise pas. Risque noté dans `docs/securite.md`.
+
+**À savoir pour l'oral**
+- Le service gratuit se met en veille après 15 minutes : ouvrir le site quelques minutes avant la présentation.
+
+**Reprise de la prochaine séance**
+- Tester le parcours complet dans le navigateur sur la version en ligne (inscription, publication, deuxième compte, abonnement, like, commentaire).
