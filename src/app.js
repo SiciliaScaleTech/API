@@ -8,6 +8,14 @@ const publicationsRoutes = require('./routes/publications.js');
 const utilisateursRoutes = require('./routes/utilisateurs.js');
 const app = express();
 
+// Hébergement derrière un proxy (Render) : les requêtes passent par un intermédiaire.
+// trust proxy permet à Express de lire la vraie adresse IP du visiteur dans l'en-tête X-Forwarded-For.
+// Sans ce réglage, tous les visiteurs partageraient le même compteur de la limitation des requêtes.
+// TRUST_PROXY = nombre de proxys devant l'API. Absent sur la VM et dans Docker, où il n'y en a pas.
+if (process.env.TRUST_PROXY) {
+  app.set('trust proxy', Number(process.env.TRUST_PROXY));
+}
+
 // Sécurité : en-têtes de protection sur chaque réponse, et suppression de X-Powered-By
 // Placé en premier pour s'appliquer à toutes les réponses, même aux erreurs
 app.use(helmet());
